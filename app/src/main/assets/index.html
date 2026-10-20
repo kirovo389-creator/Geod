@@ -286,6 +286,9 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
  .dock-btn{font-size:13px}
 }
 
+
+.leader-head-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--mint);border:1px solid rgba(69,216,166,.2);border-radius:12px;background:rgba(69,216,166,.06)}
+.leader-head-icon .ui-icon{width:27px;height:27px;stroke-width:1.7}
 </style>
 </head>
 <body>
@@ -354,13 +357,13 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
     <div class="section-title"><h2>Открытые позиции</h2><span class="sub" id="positionCount">0 активов</span></div>
     <section class="card" id="allHoldings"><div class="empty-state">Здесь появятся купленные активы.</div></section>
     <section class="card"><div class="row"><h2>История сделок</h2><span class="sub">последние 12</span></div><div id="tradeHistory" class="trade-history"><div class="empty-state">Сделок пока нет.</div></div></section>
-    <section class="card update-card"><div class="row"><div><h2>Обновления</h2><div class="sub" id="appVersionLabel">Проверка версии…</div></div><button class="outline-btn" onclick="requestAppUpdate()">Проверить</button></div><div class="sub update-note">Frilance автоматически проверяет новые версии. Установка APK подтверждается Android.</div></section>
+    <section class="card update-card"><div class="row"><div><h2>Обновления</h2><div class="sub" id="appVersionLabel">Проверка версии…</div></div><button class="outline-btn" onclick="requestAppUpdate()">Проверить</button></div><div class="sub update-note">Frilance автоматически проверяет новые версии. Установка APK подтверждается Android.</div><div class="sub update-note">Сборки до v1.0.25 могли иметь другую подпись. Для перехода со старой версии потребуется один раз удалить её и установить свежий APK; локальные данные при удалении сотрутся. Подпись новых сборок сохраняется.</div></section>
     <section class="card"><h2 style="margin-bottom:12px">Правила симулятора</h2><div class="sub" style="line-height:1.9">• Начальный баланс — $5,00.<br>• Пополнений, бонусов и ежедневных наград нет.<br>• Сделки виртуальные, цена берётся из публичных котировок.<br>• После банкротства прогресс не восстанавливается внутри игры. Для новой игры нужно очистить данные Frilance в настройках Android.</div></section>
   </section>
 
   <section class="view" id="view-leaderboard">
     <div style="margin:2px 2px 16px"><div class="eyebrow">LOCAL LEADERBOARD</div><h1>Топ игроков</h1><div class="sub">Локально сгенерированные соперники · не глобальная таблица</div></div>
-    <section class="leader-head"><div class="eyebrow" style="color:#99b4c3">ТВОЙ РЕЗУЛЬТАТ</div><div class="row" style="margin-top:8px"><div><div class="value" style="font-size:29px;margin:0" id="leaderEquity">$5.00</div><div class="sub" id="leaderRank" style="margin-top:5px">Расчёт позиции…</div></div><div style="font-size:27px;color:var(--mint)">↗</div></div></section>
+    <section class="leader-head"><div class="eyebrow" style="color:#99b4c3">ТВОЙ РЕЗУЛЬТАТ</div><div class="row" style="margin-top:8px"><div><div class="value" style="font-size:29px;margin:0" id="leaderEquity">$5.00</div><div class="sub" id="leaderRank" style="margin-top:5px">Расчёт позиции…</div></div><div class="leader-head-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 17 17 5"/><path d="M7 5h10v10"/></svg></div></div></section>
     <section class="card"><div class="row" style="margin-bottom:10px"><h2>Рейтинг капитала</h2><span class="eyebrow">LOCAL</span></div><div id="leaderList"></div></section>
     <div class="footer-note">Список соперников создаётся на устройстве. Другие игроки не подключены, результаты не синхронизируются.</div>
   </section>
@@ -391,7 +394,6 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
 <script src="trade-math.js"></script>
 <script>
 'use strict';
-const FEE = FrilanceTradeMath.feeRate;
 const ASSETS = [
   {id:'BTC',symbol:'BTC',name:'Bitcoin',source:'binance',pair:'BTCUSDT',icon:'₿'},
   {id:'ETH',symbol:'ETH',name:'Ethereum',source:'binance',pair:'ETHUSDT',icon:'◆'},
