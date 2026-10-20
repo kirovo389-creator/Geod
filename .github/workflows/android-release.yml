@@ -18,7 +18,7 @@ permissions:
 
 concurrency:
   group: frilance-android-release
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-release:
