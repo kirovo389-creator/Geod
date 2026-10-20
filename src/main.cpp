@@ -24,27 +24,25 @@ class $modify(DualMindPlayLayer, PlayLayer) {
         float jumpCooldown = 0.f;
     };
 
-    bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
-        if (!PlayLayer::init(level, useReplay, dontCreateObjects)) {
-            return false;
-        }
-
-        m_fields->lines = CCDrawNode::create();
-        if (m_fields->lines) {
-            m_fields->lines->setID("dualmind-trajectory-lines");
-            this->addChild(m_fields->lines, 1000);
-        }
-
-        log::info("DualMind loaded for Geometry Dash 2.2081 (experimental)");
-        return true;
-    }
-
     void postUpdate(float dt) {
         PlayLayer::postUpdate(dt);
 
         if (!m_player1 || m_player1->m_isDead) {
             clearLines();
             return;
+        }
+
+        // Create the drawing node after the layer has entered gameplay, not
+        // inside PlayLayer::init. This avoids attaching Cocos nodes while the
+        // level is still being initialized.
+        if (!m_fields->lines) {
+            auto* node = CCDrawNode::create();
+            if (node) {
+                node->setID("dualmind-trajectory-lines");
+                this->addChild(node, 1000);
+                m_fields->lines = node;
+                log::info("DualMind drawing node initialized");
+            }
         }
 
         if (m_fields->jumpCooldown > 0.f) {
@@ -59,7 +57,7 @@ class $modify(DualMindPlayLayer, PlayLayer) {
         drawPredictions();
 
         if (!autoJumpEnabled() || !m_player1->m_isOnGround ||
-            m_fields->jumpCooldown > 0.f || m_fields->releaseNextFrame) {
+            m_fields->jumpCooldown > 0.f || m_fields->releaseNextFrame || !m_objects) {
             return;
         }
 
