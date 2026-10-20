@@ -161,6 +161,7 @@ h1{font-size:20px;letter-spacing:-.45px}
 .dock-btn:disabled{opacity:.35}
 .dock-buy{background:#35d6a0;color:#071b13}
 .dock-sell{background:#ff6878;color:#29070d}
+.last-trade-banner[hidden]{display:none}
 .last-trade-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #29343c;border-radius:9px;background:#0d1217;padding:10px 11px;margin:9px 1px 1px;font-size:11px}
 .last-trade-main{display:flex;align-items:center;gap:8px;min-width:0}
 .trade-tag{font-size:9px;font-weight:850;letter-spacing:.35px;border-radius:6px;padding:5px 6px;white-space:nowrap}
@@ -391,6 +392,7 @@ async function fetchAssetPrice(a){
 }
 async function fetchCandles(a){
  if(a.source!=='binance')return;
+ lastCandleFetch=Date.now();
  chartLoading=true;renderChart();
  try{
    const interval=chartFrame==='1d'?'1d':chartFrame==='4h'?'4h':chartFrame==='1h'?'1h':'15m';
