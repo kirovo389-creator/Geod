@@ -12,12 +12,14 @@ close(purchase.qty, 0.05, 'Buying $5 when asset price is $100 gives 0.05 units')
 close(purchase.fee, 0, 'Buying has no fee');
 close(purchase.cost, 5, 'Purchase spends exactly the chosen amount');
 
-close(trade.sell(purchase.qty, 100).proceeds, 5, 'Selling at the entry price returns the full $5');
-close(trade.sell(purchase.qty, 20).proceeds, 1, 'A drop from $100 to $20 returns $1, not the original balance');
+close(trade.sell(purchase.qty, 100).proceeds, 5, 'Selling at the entry price returns the full $5.00');
+close(trade.sell(purchase.qty, 20).proceeds, 1, 'A drop from $100 to $20 returns $1.00');
 close(trade.sell(purchase.qty, 392).proceeds, 19.6, 'A rise from $100 to $392 returns $19.60');
 close(trade.sell(purchase.qty, 20).fee, 0, 'Selling has no fee');
-
+close(trade.sell(0.0123456789, 1).proceeds, 0.01, 'Sale proceeds are rounded to cents');
+close(trade.sell(0.004, 1).proceeds, 0, 'A sub-cent sale rounds to $0.00');
+close(trade.roundUsd(4.999999999999), 5, 'Floating-point noise does not lose a cent');
 assert.deepEqual(trade.buy(5, 0), { qty: 0, fee: 0, cost: 0 }, 'Zero price must not create a position');
 assert.deepEqual(trade.sell(0.05, 0), { gross: 0, fee: 0, proceeds: 0 }, 'Zero price must return zero');
 
-console.log('Trade math tests passed (9 checks).');
+console.log('Trade math tests passed (12 checks).');
