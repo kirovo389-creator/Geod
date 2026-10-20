@@ -276,8 +276,7 @@ async function fetchAssetPrice(a){
  const d=await fetchJSON('https://api.dexscreener.com/latest/dex/search?q='+encodeURIComponent(a.query));
  const pairs=(d.pairs||[]).filter(p=>{
    const base=(p.baseToken?.symbol||'').toUpperCase();
-   const quote=(p.quoteToken?.symbol||'').toUpperCase();
-   return base===a.symbol || (quote===a.symbol && Number(p.priceUsd)>0);
+   return base===a.symbol;
  }).filter(p=>Number(p.priceUsd)>0);
  pairs.sort((x,y)=>(Number(y.liquidity?.usd)||0)-(Number(x.liquidity?.usd)||0));
  const p=pairs[0];if(!p)throw new Error('Рынок не найден');
