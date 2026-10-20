@@ -1009,7 +1009,13 @@ public final class MainActivity extends Activity {
 
     private void requestCandles() {
         Asset asset = assetById(selectedAssetId);
-        if (asset == null || !asset.source.equals("binance") || !pendingCandles.add(asset.id)) {
+        if (asset == null) return;
+        if (!asset.source.equals("binance")) {
+            lastCandleRefresh = System.currentTimeMillis();
+            updateChart();
+            return;
+        }
+        if (!pendingCandles.add(asset.id)) {
             updateChart();
             return;
         }
@@ -1141,7 +1147,7 @@ public final class MainActivity extends Activity {
             Quote quote = quoteFor(asset);
             total = total.add(quote == null ? basis(asset.id) : TradeMath.marketValue(quantity, quote.price));
         }
-        return total;
+        return total.setScale(18, RoundingMode.HALF_UP).stripTrailingZeros();
     }
 
     private BigDecimal holding(String id) {
@@ -1262,8 +1268,12 @@ public final class MainActivity extends Activity {
     private static String money(BigDecimal value) {
         if (value == null || value.signum() == 0) return "$0.00";
         BigDecimal abs = value.abs();
+        BigDecimal exact = value.stripTrailingZeros();
         if (abs.compareTo(new BigDecimal("0.000001")) < 0) {
-            return "$" + value.stripTrailingZeros().toPlainString();
+            return "$" + exact.toPlainString();
+        }
+        if (exact.scale() > 6 && abs.compareTo(new BigDecimal("1000000000000")) < 0) {
+            return "$" + exact.toPlainString();
         }
         BigDecimal shown = value.setScale(6, RoundingMode.HALF_UP).stripTrailingZeros();
         if (shown.scale() < 2) shown = shown.setScale(2);
