@@ -5,7 +5,7 @@
   "name": "DualMind",
   "version": "v0.1.0",
   "developer": "kirovo389-creator",
-  "description": "Experimental dual-trajectory jump assistant for Geometry Dash Android 2.2081.",
+  "description": "Experimental dual-trajectory jump assistant.",
   "settings": {
     "enabled": {
       "type": "bool",
