@@ -1,0 +1,34 @@
+name: Clear repository contents
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/clear-repository.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  clear:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove all tracked files and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git ls-files -z | xargs -0 -r git rm --
+          if git diff --cached --quiet; then
+            echo "No tracked files to remove."
+            exit 0
+          fi
+          git commit -m "chore: clear repository contents"
+          git push origin HEAD:main
