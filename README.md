@@ -6,7 +6,7 @@ Frilance is an Android-only, local crypto-market simulator. It starts with **$5.
 - Dark exchange-inspired interface with a candlestick chart.
 - Public market quotes from Binance for BTC, ETH, TON, NOT and DOGE.
 - Public DEX market lookup through DexScreener for GRAM and BECAUSE; if no liquid market is found, the asset remains unavailable rather than showing a fabricated quote.
-- Virtual fractional buy/sell orders with a simulated 0.10% fee.
+- Virtual fractional buy/sell orders with zero commission; sale proceeds are rounded to cents.
 - Locally stored balance and positions, plus a local-only leaderboard with generated opponents.
 - Bankruptcy freezes play. There is no in-game restart or refill; clear Frilance app data in Android settings to start from a clean installation state.
 
@@ -25,4 +25,4 @@ The app requires an internet connection for live quotes. All orders are virtual 
 
 The market screen keeps the virtual cash balance in the top bar, expands the selected-asset chart, and pins quick buy/sell controls above navigation. Completed trades appear in a persistent last-trade label and in the local transaction history.
 
-The selected Binance price is polled once per second while the app is open; the remaining market list is refreshed less often to avoid unnecessary public API requests. New APK releases are checked automatically at launch and periodically while the app stays open. Android still requires the user to confirm APK installation. The CI keeps a stable debug signing key through a GitHub Actions cache so successive builds can update an installed copy; if that cache is purged after a long inactive period, a fresh key can be generated and a reinstall may be needed.
+The selected Binance price is polled once per second while the app is open; the remaining market list is refreshed less often to avoid unnecessary public API requests. New APK releases are checked automatically at launch and periodically while the app stays open. Android still requires the user to confirm APK installation. The CI keeps a stable debug signing key through a GitHub Actions cache so builds made with that key can update one another. APKs published before the stable key was introduced were signed differently; Android cannot update those in place. For the one-time signature migration, uninstall the old Frilance app, install the latest APK, then later updates should install normally. Uninstalling removes locally saved game progress.
