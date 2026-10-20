@@ -1,0 +1,23 @@
+{
+  "geode": "v5.3.0",
+  "gd": { "android": "2.2081" },
+  "id": "kirovo389.dualmind",
+  "name": "DualMind",
+  "version": "v0.1.0",
+  "developer": "kirovo389-creator",
+  "description": "Experimental dual-trajectory jump assistant for Geometry Dash Android 2.2081.",
+  "settings": {
+    "enabled": {
+      "type": "bool",
+      "name": "Enable auto-jump",
+      "description": "Attempts jumps near ordinary spikes. Experimental; not a guaranteed level solver.",
+      "default": false
+    },
+    "show-trajectories": {
+      "type": "bool",
+      "name": "Show prediction lines",
+      "description": "Draw two approximate candidate jump trajectories.",
+      "default": true
+    }
+  }
+}
