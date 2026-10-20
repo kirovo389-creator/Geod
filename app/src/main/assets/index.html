@@ -107,6 +107,93 @@ canvas{width:100%;height:100%;display:block}
 .source-line{font-size:9px;color:#667d8b;margin-top:7px}
 button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
 @media(min-width:650px){main{padding:22px 20px}.layout-two{display:grid;grid-template-columns:1.12fr .88fr;gap:13px;align-items:start}.layout-two .card{margin-bottom:13px}.balance-card{padding:22px}.value{font-size:39px}.chart-wrap{height:245px}.asset-list{padding:7px 16px}}
+
+/* Frilance compact exchange redesign */
+:root{--bg:#0b0e12;--panel:#12171d;--panel2:#171e26;--line:#252d36;--text:#e9edf2;--muted:#8995a2;--mint:#35d6a0;--mint-soft:rgba(53,214,160,.11);--red:#ff6878;--red-soft:rgba(255,104,120,.11);--blue:#79a8ff;--radius:12px}
+html,body{background:var(--bg)}
+body{background:var(--bg);padding-bottom:calc(180px + env(safe-area-inset-bottom))}
+.topbar{padding:calc(8px + env(safe-area-inset-top)) 12px 8px;background:rgba(11,14,18,.97);border-bottom-color:#20262d;gap:8px}
+.brand{gap:8px}.brand-icon{width:30px;height:30px}.brand-name{font-size:14px;letter-spacing:1px}.brand-sub{display:none}
+.header-right{display:flex;align-items:center;gap:8px;min-width:0}
+.header-balance{text-align:right;white-space:nowrap;line-height:1.1}
+.header-balance-label{display:block;font-size:8px;font-weight:800;letter-spacing:1px;color:var(--muted)}
+.header-balance strong{display:block;font-size:14px;font-weight:850;letter-spacing:-.3px;margin-top:3px;font-variant-numeric:tabular-nums}
+.header-balance small{display:block;font-size:8px;color:var(--muted);margin-top:3px}
+.live-pill{padding:6px 7px;font-size:8px;letter-spacing:.25px;gap:5px;border-radius:8px}
+.live-dot{width:5px;height:5px}
+main{max-width:1040px;margin:0 auto;padding:10px 12px calc(176px + env(safe-area-inset-bottom))}
+.market-heading{display:flex;justify-content:space-between;align-items:center;margin:2px 2px 10px}
+.market-heading h1{font-size:19px;letter-spacing:-.4px;margin:3px 0}
+.eyebrow{font-size:9px;letter-spacing:1px}
+h1{font-size:20px;letter-spacing:-.45px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:none;padding:13px;margin-bottom:10px}
+.card.balance-card{background:#121a20;border-color:#28343d}
+.balance-card:after{display:none}
+.balance-card .value{font-size:31px;letter-spacing:-.9px}
+.market-balance-legacy{display:none}
+.chart-card{padding:12px 10px 9px;margin-bottom:8px}
+.chart-head{padding:0 3px}
+.big-price{font-size:26px;letter-spacing:-.5px;margin:7px 0 5px}
+.chart-wrap{height:clamp(320px,48dvh,520px);margin:8px -1px 0}
+.timeframes{margin-top:5px;gap:3px}
+.tf{padding:7px 10px;font-size:10px}
+.layout-two{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(290px,.88fr);gap:12px;align-items:start}
+.layout-two .card{margin-bottom:10px}
+.trade-card{padding:13px}
+.trade-mode{margin:10px 0;grid-template-columns:1fr 1fr;background:#0d1116;border-color:#242c35}
+.mode-btn{padding:10px}
+.amount-input{border-radius:9px;background:#0d1116;border-color:#2a333c}
+.quick-btn{background:#1a222b;border-color:#2a323a}
+.primary-btn{background:#35d6a0;box-shadow:none;border-radius:9px}
+.primary-btn.sell-btn{background:#ff6878;box-shadow:none}
+.asset-list{padding:4px 11px}
+.asset-row{padding:11px 2px}
+.coin-icon{width:34px;height:34px;border-radius:10px}
+.section-title{margin:15px 2px 8px}
+.bottom-nav{padding:5px 10px calc(5px + env(safe-area-inset-bottom));background:rgba(11,14,18,.98);border-top-color:#242a31}
+.nav-btn{padding:6px 4px;font-size:9px;gap:3px}
+.nav-btn .nav-ico{font-size:17px}
+.trade-dock{position:fixed;z-index:35;left:8px;right:8px;bottom:calc(62px + env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(74px,.78fr) minmax(0,1fr) minmax(0,1fr);gap:7px;align-items:stretch;padding:8px;background:rgba(17,22,28,.98);border:1px solid #2a333c;border-radius:13px;box-shadow:0 8px 28px #0005;backdrop-filter:blur(18px)}
+.dock-amount-wrap{display:flex;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:0 2px}
+.dock-amount-wrap label{font-size:8px;font-weight:800;color:var(--muted);letter-spacing:.35px;white-space:nowrap}
+#dockAmount{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font-weight:850;font-size:17px;font-variant-numeric:tabular-nums;padding:0}
+.dock-btn{border:0;border-radius:9px;padding:0 5px;font-size:12px;font-weight:850;white-space:nowrap}
+.dock-btn:disabled{opacity:.35}
+.dock-buy{background:#35d6a0;color:#071b13}
+.dock-sell{background:#ff6878;color:#29070d}
+.last-trade-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #29343c;border-radius:9px;background:#0d1217;padding:10px 11px;margin:9px 1px 1px;font-size:11px}
+.last-trade-main{display:flex;align-items:center;gap:8px;min-width:0}
+.trade-tag{font-size:9px;font-weight:850;letter-spacing:.35px;border-radius:6px;padding:5px 6px;white-space:nowrap}
+.trade-tag.buy{color:var(--mint);background:var(--mint-soft)}
+.trade-tag.sell{color:var(--red);background:var(--red-soft)}
+.last-trade-desc{min-width:0}.last-trade-desc strong{display:block;font-size:11px}.last-trade-desc small{display:block;font-size:9px;color:var(--muted);margin-top:3px}
+.last-trade-amount{font-size:12px;font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums}
+.trade-history{margin-top:8px}
+.trade-history-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #242c34}
+.trade-history-row:last-child{border-bottom:0}
+.trade-history-left{display:flex;align-items:center;gap:9px;min-width:0}
+.trade-history-info{min-width:0}.trade-history-info strong{display:block;font-size:12px}.trade-history-info small{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
+.trade-history-right{text-align:right;white-space:nowrap;font-size:12px;font-weight:850;font-variant-numeric:tabular-nums}
+.trade-history-right small{display:block;font-size:9px;color:var(--muted);font-weight:500;margin-top:4px}
+.outline-btn{border:1px solid #33404b;background:transparent;color:var(--text);border-radius:8px;padding:9px 11px;font-size:11px;font-weight:800;white-space:nowrap}
+.update-note{margin-top:10px;line-height:1.6}
+.toast{bottom:calc(132px + env(safe-area-inset-bottom));background:#171e25;border-color:#303a44;border-radius:10px;box-shadow:0 8px 24px #0006}
+.footer-note{padding-bottom:20px}
+@media(max-width:649px){
+ .layout-two,.layout-two>div{display:contents}
+ .chart-wrap{height:clamp(320px,48dvh,440px)}
+ .layout-two .chart-card{margin-bottom:8px}
+ .trade-card{margin-top:12px}
+ .header-balance small{font-size:7px}
+ .live-pill{max-width:83px}
+ .live-pill span:last-child{overflow:hidden;text-overflow:ellipsis}
+ .trade-dock{grid-template-columns:minmax(64px,.68fr) minmax(0,1fr) minmax(0,1fr);gap:6px;left:6px;right:6px;padding:7px}
+ .dock-btn{font-size:11px}
+}
+@media(min-width:650px){
+ .chart-wrap{height:clamp(360px,55dvh,590px)}
+ .trade-dock{left:calc(50% - 300px);right:calc(50% - 300px);bottom:calc(72px + env(safe-area-inset-bottom))}
+}
 </style>
 </head>
 <body>
@@ -120,17 +207,19 @@ button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
     </svg>
     <div><div class="brand-name">FRILANCE</div><div class="brand-sub">CRYPTO SIMULATOR</div></div>
   </div>
-  <div class="live-pill" id="livePill"><span class="live-dot"></span><span id="liveText">CONNECTING</span></div>
+  <div class="header-right">
+    <div class="header-balance"><span class="header-balance-label">БАЛАНС</span><strong id="headerCash">$5.00</strong><small id="headerEquity">капитал $5.00</small></div>
+    <div class="live-pill" id="livePill"><span class="live-dot"></span><span id="liveText">CONNECTING</span></div>
+  </div>
 </header>
 
 <main>
   <section class="view active" id="view-market">
-    <div class="row" style="margin:2px 2px 15px">
-      <div><div class="eyebrow">MARKET OVERVIEW</div><h1>Твой терминал</h1><div class="sub" id="marketUpdated">Загружаем котировки…</div></div>
-      <div style="text-align:right"><div class="eyebrow">ИГРОК</div><div style="font-size:12px;font-weight:850;margin-top:5px">TRADER-07</div></div>
+    <div class="market-heading">
+      <div><div class="eyebrow">РЫНОК</div><h1>Рынок</h1><div class="sub" id="marketUpdated">Загружаем котировки…</div></div>
     </div>
 
-    <section class="card balance-card">
+    <section class="card balance-card market-balance-legacy">
       <div class="balance-head"><div class="eyebrow" style="color:#a1c9c0">ОБЩАЯ СТОИМОСТЬ ПОРТФЕЛЯ</div><span class="change-chip neutral" id="equityTrend">—</span></div>
       <div class="value" id="equityValue">$5.00</div>
       <div class="sub" style="color:#a5b9c0">Виртуальные средства · без пополнений</div>
@@ -152,7 +241,8 @@ button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
             <div class="eyebrow" style="text-align:right">LIVE<br><span style="display:inline-block;margin-top:6px;color:var(--mint)">USD</span></div>
           </div>
           <div class="chart-wrap"><canvas id="priceChart"></canvas><div class="chart-overlay" id="chartOverlay">Загружаем реальные рыночные данные…</div></div>
-          <div class="timeframes"><button class="tf active" data-tf="15m">15м</button><button class="tf" data-tf="1h">1Ч</button><button class="tf" data-tf="4h">4Ч</button><button class="tf" data-tf="1d">1Д</button><span style="flex:1"></span><span class="sub" style="align-self:center">СВЕЧНОЙ ГРАФИК</span></div>
+          <div class="timeframes"><button class="tf active" data-tf="15m">15м</button><button class="tf" data-tf="1h">1Ч</button><button class="tf" data-tf="4h">4Ч</button><button class="tf" data-tf="1d">1Д</button><span style="flex:1"></span><span class="sub" style="align-self:center">СВЕЧИ · LIVE</span></div>
+          <div class="last-trade-banner" id="lastTradeBanner" hidden></div>
         </section>
         <div class="section-title"><h2>Рынок</h2><button class="link-btn" onclick="refreshPrices(true)">Обновить ↻</button></div>
         <section class="card asset-list" id="assetList"></section>
@@ -188,6 +278,8 @@ button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
     </section>
     <div class="section-title"><h2>Открытые позиции</h2><span class="sub" id="positionCount">0 активов</span></div>
     <section class="card" id="allHoldings"><div class="empty-state">Здесь появятся купленные активы.</div></section>
+    <section class="card"><div class="row"><h2>История сделок</h2><span class="sub">последние 12</span></div><div id="tradeHistory" class="trade-history"><div class="empty-state">Сделок пока нет.</div></div></section>
+    <section class="card update-card"><div class="row"><div><h2>Обновления</h2><div class="sub" id="appVersionLabel">Проверка версии…</div></div><button class="outline-btn" onclick="requestAppUpdate()">Проверить</button></div><div class="sub update-note">Frilance автоматически проверяет новые версии. Установка APK подтверждается Android.</div></section>
     <section class="card"><h2 style="margin-bottom:12px">Правила симулятора</h2><div class="sub" style="line-height:1.9">• Начальный баланс — $5,00.<br>• Пополнений, бонусов и ежедневных наград нет.<br>• Сделки виртуальные, цена берётся из публичных котировок.<br>• После банкротства прогресс не восстанавливается внутри игры. Для новой игры нужно очистить данные Frilance в настройках Android.</div></section>
   </section>
 
@@ -205,6 +297,11 @@ button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
   <button class="nav-btn" data-view="leaderboard" onclick="showView('leaderboard')"><span class="nav-ico">♙</span>РЕЙТИНГ</button>
 </nav>
 
+<div class="trade-dock" id="tradeDock" aria-label="Быстрая торговля">
+  <div class="dock-amount-wrap"><label id="dockAmountLabel" for="dockAmount">Сумма · USD</label><input id="dockAmount" type="number" inputmode="decimal" min="0" step="0.01" value="1.00" aria-label="Сумма быстрой сделки"></div>
+  <button class="dock-btn dock-buy" id="dockBuy" onclick="dockTrade('buy')" disabled>Купить BTC</button>
+  <button class="dock-btn dock-sell" id="dockSell" onclick="dockTrade('sell')" disabled>Продать BTC</button>
+</div>
 <div id="toast" class="toast" role="status"></div>
 <div id="gameOver" class="game-over" role="dialog" aria-modal="true">
   <div class="gameover-box">
@@ -273,7 +370,7 @@ function signClass(n){return n>0?'positive':n<0?'negative':'neutral';}
 function fmtChange(n){if(!Number.isFinite(Number(n)))return '—';return (Number(n)>0?'+':'')+Number(n).toFixed(2)+'%';}
 function toast(text){const el=document.getElementById('toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);}
 function setGameOver(){if(state.gameOver)return;state.gameOver=true;persist();document.getElementById('gameOver').classList.add('show');document.querySelectorAll('.primary-btn').forEach(b=>b.disabled=true);}
-function showView(view){document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+view));document.querySelectorAll('.nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.view===view));if(view==='portfolio')renderPortfolio();if(view==='leaderboard')renderLeaderboard();window.scrollTo({top:0,behavior:'smooth'});}
+function showView(view){document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+view));document.querySelectorAll('.nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.view===view));document.getElementById('tradeDock').style.display=view==='market'?'grid':'none';if(view==='portfolio')renderPortfolio();if(view==='leaderboard')renderLeaderboard();window.scrollTo({top:0,behavior:'smooth'});}
 function selectedAsset(){return assetById(state.selected);}
 function formatTime(){return new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
 async function fetchJSON(url){const r=await fetch(url,{cache:'no-store',headers:{'accept':'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
@@ -305,6 +402,41 @@ async function fetchCandles(a){
  }
  chartLoading=false;renderChart();
 }
+
+let selectedTickBusy=false;
+let lastTickPersist=0;
+async function refreshSelectedTick(){
+ if(selectedTickBusy||document.hidden)return;
+ selectedTickBusy=true;
+ const a=selectedAsset();
+ try{
+   let data;
+   if(a.source==='binance'){
+     const d=await fetchJSON('https://api.binance.com/api/v3/ticker/price?symbol='+encodeURIComponent(a.pair));
+     const p=Number(d.price);
+     if(!(p>0))throw new Error('Цена недоступна');
+     data={...(prices[a.id]||{}),price:p,updated:Date.now(),stale:false};
+   }else{
+     if(Date.now()-(prices[a.id]?.updated||0)<5000)return;
+     const d=await fetchAssetPrice(a);
+     data={...d,updated:Date.now(),stale:false};
+   }
+   prices[a.id]=data;
+   if(!state.snapshots[a.id])state.snapshots[a.id]=[];
+   const series=state.snapshots[a.id];
+   if(!series.length||Math.abs(series[series.length-1].p-data.price)/data.price>.0000001){
+     series.push({t:Date.now(),p:data.price});
+     if(series.length>100)series.splice(0,series.length-100);
+   }
+   renderAll();
+   if(Date.now()-lastTickPersist>10000){persist();lastTickPersist=Date.now();}
+   if(a.source==='binance'&&Date.now()-lastCandleFetch>30000)fetchCandles(a);
+ }catch(e){
+   if(prices[a.id])prices[a.id].stale=true;
+   renderSelected();
+ }finally{selectedTickBusy=false;}
+}
+
 async function refreshPrices(manual=false){
  let ok=0;
  await Promise.all(ASSETS.map(async a=>{
@@ -358,9 +490,19 @@ function renderSelected(){
  b.className='primary-btn'+(state.mode==='sell'?' sell-btn':'');
  b.disabled=state.gameOver||!q||q.stale||!(q.price>0)||(state.mode==='sell'&&holding(a.id)<=0);
  updateOrderSummary();
+ const dock=document.getElementById('dockAmount');
+ if(dock&&document.activeElement!==dock)dock.value=document.getElementById('orderAmount').value;
+ document.getElementById('dockAmountLabel').textContent=state.mode==='buy'?'Сумма · USD':'Доля позиции · %';
+ document.getElementById('dockBuy').textContent='Купить '+a.symbol;
+ document.getElementById('dockSell').textContent='Продать '+a.symbol;
+ document.getElementById('dockBuy').disabled=state.gameOver||!q||q.stale||!(q.price>0)||state.cash<=0.001;
+ document.getElementById('dockSell').disabled=state.gameOver||!q||q.stale||!(q.price>0)||holding(a.id)<=0;
+ renderLastTrade();
 }
 function renderBalances(){
  const e=equity(),p=pnl();
+ document.getElementById('headerCash').textContent=money(state.cash);
+ document.getElementById('headerEquity').textContent='капитал '+money(e);
  document.getElementById('equityValue').textContent=money(e);
  document.getElementById('cashValue').textContent=money(state.cash);
  document.getElementById('pnlValue').textContent=(p>0?'+':'')+money(p);
@@ -469,6 +611,43 @@ function renderChart(){
  ctx.fillStyle='#6f8291';ctx.font='9px system-ui';ctx.textAlign='left';ctx.fillText('−'+chartFrame,pad.l,h-2);ctx.textAlign='right';ctx.fillText('СЕЙЧАС',w-pad.r,h-2);
 }
 function shortPrice(n){if(!Number.isFinite(n))return '—';if(n>=1000)return '$'+(n/1000).toFixed(1)+'k';if(n>=1)return '$'+n.toFixed(n<10?2:0);return '$'+n.toPrecision(2);}
+
+function renderLastTrade(){
+ const el=document.getElementById('lastTradeBanner'),t=state.trades[0];
+ if(!t){el.hidden=true;el.innerHTML='';return;}
+ const a=assetById(t.asset),buy=t.side==='BUY';
+ const time=new Date(t.t).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+ el.hidden=false;
+ el.innerHTML='<div class="last-trade-main"><span class="trade-tag '+(buy?'buy':'sell')+'">'+(buy?'КУПЛЕНО':'ПРОДАНО')+'</span><div class="last-trade-desc"><strong>'+a.symbol+' · '+qtyFmt(t.qty)+' шт.</strong><small>'+time+' · '+priceFmt(t.price)+'</small></div></div><div class="last-trade-amount">'+(buy?'Потрачено ':'Получено ')+money(t.usd)+'</div>';
+}
+function renderTradeHistory(){
+ const el=document.getElementById('tradeHistory'),rows=state.trades.slice(0,12);
+ if(!rows.length){el.innerHTML='<div class="empty-state">Сделок пока нет.</div>';return;}
+ el.innerHTML=rows.map(t=>{
+   const a=assetById(t.asset),buy=t.side==='BUY';
+   const dt=new Date(t.t).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+   return '<div class="trade-history-row"><div class="trade-history-left"><span class="trade-tag '+(buy?'buy':'sell')+'">'+(buy?'КУПИЛ':'ПРОДАЛ')+'</span><div class="trade-history-info"><strong>'+a.symbol+' · '+qtyFmt(t.qty)+'</strong><small>'+dt+' · цена '+priceFmt(t.price)+' · комиссия '+money(t.fee||0,4)+'</small></div></div><div class="trade-history-right">'+money(t.usd)+'<small>'+(buy?'потрачено':'получено')+'</small></div></div>';
+ }).join('');
+}
+function dockTrade(mode){
+ const field=document.getElementById('dockAmount');
+ const amount=state.mode===mode?field.value:(mode==='buy'?'1.00':'100');
+ setTradeMode(mode,false);
+ document.getElementById('orderAmount').value=amount;
+ field.value=amount;
+ updateOrderSummary();
+ executeOrder();
+}
+function requestAppUpdate(){
+ if(window.Android&&typeof window.Android.checkForUpdates==='function')window.Android.checkForUpdates();
+ else toast('Проверка обновлений доступна в Android-приложении.');
+}
+function updateVersionLabel(){
+ const el=document.getElementById('appVersionLabel');
+ if(window.Android&&typeof window.Android.getAppVersion==='function')el.textContent='Установлена версия '+window.Android.getAppVersion();
+ else el.textContent='Версия Android-приложения';
+}
+
 function renderHoldings(elId,compact){
  const el=document.getElementById(elId);
  const rows=ASSETS.filter(a=>holding(a.id)>0);
@@ -478,7 +657,7 @@ function renderHoldings(elId,compact){
    return '<div class="holding-row"><div class="asset-left"><span class="coin-icon coin-'+a.id+'">'+a.icon+'</span><div><div class="asset-symbol">'+a.symbol+'</div><div class="asset-fullname">'+qtyFmt(qty)+' '+a.symbol+'</div></div></div><div><div class="position-value">'+(q?money(val):'—')+'</div><div class="asset-change '+(q?signClass(q.change):'neutral')+'" style="text-align:right">'+(q?fmtChange(q.change):'нет данных')+'</div></div></div>';
  }).join('')+'</div>';
 }
-function renderPortfolio(){renderBalances();renderHoldings('allHoldings',false);document.getElementById('positionCount').textContent=ASSETS.filter(a=>holding(a.id)>0).length+' активов';}
+function renderPortfolio(){renderBalances();renderHoldings('allHoldings',false);renderTradeHistory();document.getElementById('positionCount').textContent=ASSETS.filter(a=>holding(a.id)>0).length+' активов';}
 function renderLeaderboard(){
  const player={name:'TRADER-07',value:equity(),avatar:'07',player:true};
  const all=BOT_SEED.map(x=>({...x})).concat([player]).sort((a,b)=>b.value-a.value);
@@ -490,17 +669,19 @@ function renderLeaderboard(){
  }).join('');
 }
 function renderAll(){renderBalances();renderSelected();renderAssets();renderChart();renderHoldings('miniHoldings',true);if(document.getElementById('view-portfolio').classList.contains('active'))renderPortfolio();if(document.getElementById('view-leaderboard').classList.contains('active'))renderLeaderboard();}
-document.getElementById('orderAmount').addEventListener('input',updateOrderSummary);
+document.getElementById('orderAmount').addEventListener('input',()=>{const d=document.getElementById('dockAmount');if(document.activeElement!==d)d.value=document.getElementById('orderAmount').value;updateOrderSummary();});
+document.getElementById('dockAmount').addEventListener('input',()=>{document.getElementById('orderAmount').value=document.getElementById('dockAmount').value;updateOrderSummary();});
 document.querySelectorAll('.tf').forEach(btn=>btn.addEventListener('click',()=>{
  document.querySelectorAll('.tf').forEach(b=>b.classList.remove('active'));btn.classList.add('active');chartFrame=btn.dataset.tf;candles[state.selected]=null;lastCandleFetch=0;fetchCandles(selectedAsset());
 }));
 window.addEventListener('resize',renderChart);
 window.addEventListener('online',()=>refreshPrices(true));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshPrices(false);});
-renderAssets();renderBalances();renderSelected();renderChart();renderHoldings('miniHoldings',true);
+renderAssets();renderBalances();renderSelected();renderChart();renderHoldings('miniHoldings',true);updateVersionLabel();
 if(state.gameOver)document.getElementById('gameOver').classList.add('show');
 refreshPrices(false);
 setInterval(()=>{if(!document.hidden)refreshPrices(false);},20000);
+setInterval(()=>{if(!document.hidden)refreshSelectedTick();},1000);
 </script>
 </body>
 </html>

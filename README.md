@@ -19,3 +19,10 @@ The app requires an internet connection for live quotes. All orders are virtual 
 - Exchange ticker and candlestick API: Binance public market data.
 - DEX token lookup: DexScreener public search API.
 - The local leaderboard is not connected to other devices or players.
+
+
+## Trading screen and updates
+
+The market screen keeps the virtual cash balance in the top bar, expands the selected-asset chart, and pins quick buy/sell controls above navigation. Completed trades appear in a persistent last-trade label and in the local transaction history.
+
+The selected Binance price is polled once per second while the app is open; the remaining market list is refreshed less often to avoid unnecessary public API requests. New APK releases are checked automatically at launch and periodically while the app stays open. Android still requires the user to confirm APK installation. The CI keeps a stable debug signing key through a GitHub Actions cache so successive builds can update an installed copy; if that cache is purged after a long inactive period, a fresh key can be generated and a reinstall may be needed.

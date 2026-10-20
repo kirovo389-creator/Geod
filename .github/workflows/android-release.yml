@@ -42,6 +42,23 @@ jobs:
       - name: Install Android 35 platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
+      - name: Restore stable debug signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: frilance-debug-signing-key-v1
+
+      - name: Create signing key on first build
+        run: |
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -alias androiddebugkey -keypass android \
+              -dname "CN=Frilance Debug,O=Frilance,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -76,7 +93,9 @@ jobs:
             Frilance — Android crypto-market simulation.
 
             - Starting balance: $5.00 virtual cash
-            - Live public market quotes when available
+            - Live public market quotes and one-second selected-price refresh
+            - Quick buy/sell dock and transaction history
+            - In-app update checker
             - Local-only progress and leaderboard
             - No real-money trades, deposits, or rewards
 
