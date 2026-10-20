@@ -226,13 +226,23 @@ const ASSETS = [
   {id:'GRAM',symbol:'GRAM',name:'Gram',source:'dex',query:'GRAM',icon:'G'},
   {id:'BECAUSE',symbol:'BECAUSE',name:'Because',source:'dex',query:'BECAUSE',icon:'B'}
 ];
-const BOT_SEED = [
- {name:'nightowl',value:34.82,avatar:'N'}, {name:'SatoshiKid',value:22.47,avatar:'S'},
- {name:'chartfox',value:16.30,avatar:'C'}, {name:'LimeTrader',value:12.86,avatar:'L'},
- {name:'bluecandle',value:9.44,avatar:'B'}, {name:'zero2hero',value:7.18,avatar:'Z'},
- {name:'quantum7',value:6.10,avatar:'Q'}, {name:'pixelbull',value:4.32,avatar:'P'},
- {name:'tinywhale',value:3.24,avatar:'T'}
+const BOT_PROFILES = [
+ {name:'nightowl',base:34.82,avatar:'N'}, {name:'SatoshiKid',base:22.47,avatar:'S'},
+ {name:'chartfox',base:16.30,avatar:'C'}, {name:'LimeTrader',base:12.86,avatar:'L'},
+ {name:'bluecandle',base:9.44,avatar:'B'}, {name:'zero2hero',base:7.18,avatar:'Z'},
+ {name:'quantum7',base:6.10,avatar:'Q'}, {name:'pixelbull',base:4.32,avatar:'P'},
+ {name:'tinywhale',base:3.24,avatar:'T'}
 ];
+function loadLocalBots(){
+ try{
+   const stored=JSON.parse(localStorage.getItem('frilance_local_bots')||'null');
+   if(Array.isArray(stored)&&stored.length===BOT_PROFILES.length&&stored.every(p=>typeof p.name==='string'&&Number.isFinite(p.value)))return stored;
+ }catch(e){}
+ const generated=BOT_PROFILES.map(p=>({name:p.name,avatar:p.avatar,value:Number((p.base*(0.78+Math.random()*0.54)).toFixed(2))}));
+ try{localStorage.setItem('frilance_local_bots',JSON.stringify(generated));}catch(e){}
+ return generated;
+}
+const BOT_SEED = loadLocalBots();
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem('frilance_state') || '{}') || {}; } catch (e) { saved = {}; }
 const state = {
