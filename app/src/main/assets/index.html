@@ -319,6 +319,55 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
  .quick-btn{min-height:46px;font-size:12px}
 }
 
+
+/* Final touch-target pass: larger controls and crisp minimalist line icons. */
+.ui-icon{width:28px;height:28px;stroke-width:2}
+.nav-ico{width:38px;height:37px}
+.nav-ico .ui-icon{width:32px;height:32px;stroke-width:1.9}
+.nav-btn{min-height:72px;padding:9px 5px;font-size:10px;gap:7px}
+.dock-btn{min-height:60px;font-size:13px;padding:0 8px;border-radius:12px}
+.dock-btn .ui-icon{width:25px;height:25px}
+.dock-max{font-size:15px}
+.primary-btn{min-height:62px;font-size:16px}
+.quick-btn{min-height:52px;font-size:14px}
+.mode-btn{min-height:50px;font-size:14px}
+.outline-btn{min-height:50px;font-size:13px}
+.tf{min-height:43px;font-size:12px}
+.asset-row{min-height:70px}
+.coin-icon{width:46px;height:46px;font-size:15px}
+@media(max-width:649px){.nav-btn{min-height:66px}.nav-ico{width:34px;height:33px}.nav-ico .ui-icon{width:29px;height:29px}.trade-dock{min-height:78px}.dock-btn{min-height:60px;font-size:12px}.dock-btn .ui-icon{width:23px;height:23px}}
+
+/* Frilance UI fixes: readable wallet labels and non-overlapping mobile controls. */
+#view-market.active.market-screen{bottom:calc(158px + env(safe-area-inset-bottom))}
+.header-balance-label{font-size:8px;letter-spacing:.45px}
+.header-balance small{font-size:8px;letter-spacing:.05px}
+.trade-dock{bottom:calc(76px + env(safe-area-inset-bottom));grid-template-columns:minmax(0,1fr) 36px minmax(0,1.05fr) minmax(0,1.05fr);gap:6px;padding:7px;min-height:72px}
+.dock-amount-wrap{min-width:0;min-height:54px}
+.dock-amount-wrap label{font-size:8px;line-height:1.15;white-space:normal}
+#dockAmount{font-size:17px}
+.dock-btn{min-width:0;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;white-space:normal;line-height:1.05;font-size:10px;padding:4px 3px;border-radius:9px}
+.dock-btn .ui-icon{width:19px;height:19px}
+.dock-max{font-size:12px}
+.bottom-nav{min-height:62px;padding-top:5px;padding-bottom:calc(5px + env(safe-area-inset-bottom))}
+.nav-btn{min-width:0;min-height:58px;padding:5px 2px;gap:4px;font-size:9px;letter-spacing:.2px}
+.nav-ico{width:30px;height:29px}.nav-ico .ui-icon{width:25px;height:25px}
+.toast{bottom:calc(92px + env(safe-area-inset-bottom));max-width:calc(100vw - 24px);padding:10px 13px;font-size:12px;line-height:1.35;z-index:80}
+body.chart-mode .toast{bottom:calc(158px + env(safe-area-inset-bottom))}
+.last-trade-banner{line-height:1.35}
+@media(max-width:380px){
+ #view-market.active.market-screen{bottom:calc(154px + env(safe-area-inset-bottom))}
+ .trade-dock{left:4px;right:4px;grid-template-columns:minmax(0,1fr) 32px minmax(0,.98fr) minmax(0,.98fr);gap:4px;padding:6px}
+ .dock-btn{min-height:53px;font-size:9px;padding:3px 2px}
+ .dock-btn .ui-icon{width:17px;height:17px}
+ .dock-amount-wrap label{font-size:7.5px}
+ #dockAmount{font-size:16px}
+ .nav-btn{font-size:8px}
+}
+@media(min-width:650px){
+ #view-market.active.market-screen{bottom:calc(164px + env(safe-area-inset-bottom))}
+ .trade-dock{left:calc(50% - 330px);right:calc(50% - 330px);bottom:calc(82px + env(safe-area-inset-bottom));grid-template-columns:minmax(140px,1fr) 50px minmax(130px,1fr) minmax(130px,1fr);gap:8px;padding:10px}
+ .dock-btn{min-height:60px;font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -333,7 +382,7 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
     <div><div class="brand-name">FRILANCE</div><div class="brand-sub">CRYPTO SIMULATOR</div></div>
   </div>
   <div class="header-right">
-    <div class="header-balance"><span class="header-balance-label">БАЛАНС</span><strong id="headerCash">$5.00</strong><small id="headerEquity">капитал $5.00</small></div>
+    <div class="header-balance"><span class="header-balance-label">НАЛИЧНЫЕ</span><strong id="headerCash">$5.00</strong><small id="headerEquity">портфель $5.00</small></div>
     <div class="live-pill" id="livePill"><span class="live-dot"></span><span id="liveText">CONNECTING</span></div>
   </div>
 </header>
@@ -492,7 +541,27 @@ function equity(){return state.cash+ASSETS.reduce((sum,a)=>sum+holding(a.id)*(pr
 function pnl(){return equity()-5;}
 function signClass(n){return n>0?'positive':n<0?'negative':'neutral';}
 function fmtChange(n){if(!Number.isFinite(Number(n)))return '—';return (Number(n)>0?'+':'')+Number(n).toFixed(2)+'%';}
-function toast(text){const el=document.getElementById('toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);}
+function toast(text){const el=document.getElementById('toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3500);}
+const DROP_ALERT_THRESHOLD=-15;
+const DROP_ALERT_RESET_THRESHOLD=-10;
+const DROP_ALERT_COOLDOWN_MS=6*60*60*1000;
+function checkSharpDropAlerts(){
+ const now=Date.now();let last={};
+ try{const stored=JSON.parse(localStorage.getItem('frilance_drop_alerts')||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored))last=stored;}catch(e){}
+ const due=[];
+ ASSETS.forEach(a=>{
+  const q=prices[a.id];if(!q||q.stale||!Number.isFinite(Number(q.change)))return;
+  const change=Number(q.change);
+  if(change>DROP_ALERT_RESET_THRESHOLD){delete last[a.id];return;}
+  if(change<=DROP_ALERT_THRESHOLD&&now-(Number(last[a.id])||0)>=DROP_ALERT_COOLDOWN_MS)due.push({asset:a,change});
+ });
+ if(!due.length){try{localStorage.setItem('frilance_drop_alerts',JSON.stringify(last));}catch(e){}return;}
+ due.sort((a,b)=>a.change-b.change);
+ due.forEach(item=>{last[item.asset.id]=now;});
+ try{localStorage.setItem('frilance_drop_alerts',JSON.stringify(last));}catch(e){}
+ const event=due[0];
+ toast('Эй, '+event.asset.symbol+' упал на '+Math.abs(event.change).toFixed(1)+'% за 24 ч. Проверь график и сам реши насчёт виртуальной сделки.');
+}
 function setGameOver(){if(state.gameOver)return;state.gameOver=true;persist();document.getElementById('gameOver').classList.add('show');document.querySelectorAll('.primary-btn').forEach(b=>b.disabled=true);}
 function showView(view){
  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+view));
@@ -591,6 +660,7 @@ async function refreshPrices(manual=false){
  document.getElementById('marketUpdated').textContent=fresh>0?'Обновлено '+formatTime()+' · цены с рынка':'Нет соединения с ценовым API';
  renderAll();
  if(manual)toast(fresh>0?'Котировки обновлены':'Не удалось получить котировки. Проверь подключение.');
+  checkSharpDropAlerts();
  if(state.selected&&assetById(state.selected).source==='binance'&&(!candles[state.selected]||Date.now()-lastCandleFetch>60000))fetchCandles(selectedAsset());
  if(equity()<0.01)setGameOver();
  persist();
@@ -689,24 +759,24 @@ function executeOrder(){
  if(!q||q.stale||!(q.price>0)){toast('Нет актуальной цены. Дождись обновления.');return;}
  const val=Math.max(0,Number(input.value)||0);
  if(state.mode==='buy'){
-   const spend=Math.min(val,state.cash);
+   const spend=cents(Math.min(cents(Math.max(0,val)),cents(state.cash)));
    if(!(spend>0.001)){toast('Недостаточно виртуальных USD.');return;}
    const buyQuote=FrilanceTradeMath.buy(spend,q.price),qty=buyQuote.qty;
    state.cash=Math.max(0,cents(state.cash-spend));state.holdings[a.id]=holding(a.id)+qty;
    state.costBasis[a.id]=(Number(state.costBasis[a.id])||0)+spend;
    state.trades.unshift({t:Date.now(),side:'BUY',asset:a.id,qty,price:q.price,usd:spend,fee:buyQuote.fee});
-   toast('Куплено '+qtyFmt(qty)+' '+a.symbol+' за '+money(spend)+' · цена '+priceFmt(q.price)+' · без комиссии');
+   toast('Куплено '+qtyFmt(qty)+' '+a.symbol+' за '+money(spend)+' · остаток '+money(state.cash)+' · без комиссии');
  }else{
    const fraction=Math.min(100,val)/100;
    const qty=holding(a.id)*fraction;
    if(!(qty>0)){toast('Нет позиции для продажи.');return;}
-   const heldBefore=holding(a.id),saleQuote=FrilanceTradeMath.sell(qty,q.price),gross=saleQuote.gross,fee=saleQuote.fee,proceeds=saleQuote.proceeds;
+   const heldBefore=holding(a.id),saleQuote=FrilanceTradeMath.settleSale(state.cash,qty,q.price),gross=saleQuote.gross,fee=saleQuote.fee,proceeds=saleQuote.proceeds;
    const basisBefore=Math.max(0,Number(state.costBasis[a.id])||0),costSold=heldBefore>0?basisBefore*(qty/heldBefore):0,realized=proceeds-costSold;
    state.holdings[a.id]=Math.max(0,heldBefore-qty);state.costBasis[a.id]=Math.max(0,basisBefore-costSold);
    if(state.holdings[a.id]<1e-12){delete state.holdings[a.id];delete state.costBasis[a.id];}
-   state.cash=cents(state.cash+proceeds);
+   state.cash=saleQuote.cashAfter;
    state.trades.unshift({t:Date.now(),side:'SELL',asset:a.id,qty,price:q.price,usd:proceeds,fee,costBasisSold:costSold,realizedPnl:realized});
-   toast('Продано '+qtyFmt(qty)+' '+a.symbol+' · получено '+money(proceeds)+' · P/L '+(realized>0?'+':'')+money(realized));
+   toast('Продано '+qtyFmt(qty)+' '+a.symbol+' · получено '+money(proceeds)+' · баланс '+money(state.cash)+' · P/L '+(realized>0?'+':'')+money(realized));
  }
  state.trades=state.trades.slice(0,80);
  persist();renderAll();
@@ -842,21 +912,3 @@ setInterval(()=>{if(!document.hidden)refreshSelectedTick();},1000);
 </body>
 </html>
 
-<style>
-/* Final touch-target pass: larger controls and crisp minimalist line icons. */
-.ui-icon{width:28px;height:28px;stroke-width:2}
-.nav-ico{width:38px;height:37px}
-.nav-ico .ui-icon{width:32px;height:32px;stroke-width:1.9}
-.nav-btn{min-height:72px;padding:9px 5px;font-size:10px;gap:7px}
-.dock-btn{min-height:60px;font-size:13px;padding:0 8px;border-radius:12px}
-.dock-btn .ui-icon{width:25px;height:25px}
-.dock-max{font-size:15px}
-.primary-btn{min-height:62px;font-size:16px}
-.quick-btn{min-height:52px;font-size:14px}
-.mode-btn{min-height:50px;font-size:14px}
-.outline-btn{min-height:50px;font-size:13px}
-.tf{min-height:43px;font-size:12px}
-.asset-row{min-height:70px}
-.coin-icon{width:46px;height:46px;font-size:15px}
-@media(max-width:649px){.nav-btn{min-height:66px}.nav-ico{width:34px;height:33px}.nav-ico .ui-icon{width:29px;height:29px}.trade-dock{min-height:78px}.dock-btn{min-height:60px;font-size:12px}.dock-btn .ui-icon{width:23px;height:23px}}
-</style>

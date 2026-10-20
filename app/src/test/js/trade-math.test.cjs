@@ -22,4 +22,15 @@ close(trade.roundUsd(4.999999999999), 5, 'Floating-point noise does not lose a c
 assert.deepEqual(trade.buy(5, 0), { qty: 0, fee: 0, cost: 0 }, 'Zero price must not create a position');
 assert.deepEqual(trade.sell(0.05, 0), { gross: 0, fee: 0, proceeds: 0 }, 'Zero price must return zero');
 
-console.log('Trade math tests passed (12 checks).');
+const lossSale = trade.settleSale(0, 1, 20);
+close(lossSale.proceeds, 20, 'Selling one coin at $20 returns $20, not the entry price');
+close(lossSale.cashAfter, 20, 'A losing sale credits $20 to a zero-cash wallet');
+const profitSale = trade.settleSale(0, 1, 150);
+close(profitSale.proceeds, 150, 'Selling one coin at $150 returns $150');
+close(profitSale.cashAfter, 150, 'A profitable sale credits $150 to the wallet');
+const fractionalSale = trade.settleSale(0, 0.05, 128);
+close(fractionalSale.proceeds, 6.4, 'Selling 0.05 coin at $128 returns $6.40');
+close(fractionalSale.cashAfter, 6.4, 'A fractional position sale credits $6.40 to the wallet');
+const existingCashSale = trade.settleSale(10.01, 0.5, 20);
+close(existingCashSale.cashAfter, 20.01, 'Sale proceeds add to remaining cash without floating-point dust');
+console.log('Trade math tests passed (19 checks).');

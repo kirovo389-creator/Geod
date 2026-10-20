@@ -24,7 +24,13 @@
     return { gross, fee: 0, proceeds: roundUsd(gross) };
   }
 
-  const api = Object.freeze({ feeRate: 0, buy, sell, roundUsd });
+  function settleSale(cash, quantity, price) {
+    const sale = sell(quantity, price);
+    const cashAfter = roundUsd(nonNegative(cash) + sale.proceeds);
+    return { ...sale, cashAfter };
+  }
+
+  const api = Object.freeze({ feeRate: 0, buy, sell, settleSale, roundUsd });
   root.FrilanceTradeMath = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
