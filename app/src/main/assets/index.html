@@ -469,7 +469,8 @@ let chartFrame = '15m';
 let chartLoading = false;
 let lastCandleFetch = 0;
 let toastTimer = null;
-function persist(){try{localStorage.setItem('frilance_state',JSON.stringify({cash:state.cash,holdings:state.holdings,selected:state.selected,snapshots:state.snapshots,trades:state.trades.slice(0,80),costBasis:state.costBasis,gameOver:state.gameOver}));}catch(e){}}
+function cents(n){return Math.round((Number(n)+Number.EPSILON)*100)/100;}
+function persist(){try{state.cash=cents(state.cash);localStorage.setItem('frilance_state',JSON.stringify({cash:state.cash,holdings:state.holdings,selected:state.selected,snapshots:state.snapshots,trades:state.trades.slice(0,80),costBasis:state.costBasis,gameOver:state.gameOver}));}catch(e){}}
 function money(n,dec=2){if(!Number.isFinite(Number(n)))return '—';return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});}
 function priceFmt(n){if(!Number.isFinite(Number(n)))return '—';const v=Number(n);return '$'+v.toLocaleString('en-US',{minimumFractionDigits:v<1?4:2,maximumFractionDigits:v<1?8:2});}
 function qtyFmt(n){if(!Number.isFinite(Number(n)))return '0';return Number(n).toLocaleString('en-US',{maximumFractionDigits:8});}
@@ -677,7 +678,7 @@ function updateOrderSummary(){
  const val=Math.max(0,Number(input.value)||0);
  let summary='—';
  if(q&&q.price>0){
-   if(state.mode==='buy'){const spend=Math.min(val,state.cash);summary=spend>0?qtyFmt(FrilanceTradeMath.buy(spend,q.price).qty)+' '+a.symbol:'Недостаточно USD';}
+   if(state.mode==='buy'){const spend=cents(Math.min(cents(val),cents(state.cash)));summary=spend>0?qtyFmt(FrilanceTradeMath.buy(spend,q.price).qty)+' '+a.symbol:'Недостаточно USD';}
    else {const qty=holding(a.id)*Math.min(100,val)/100;summary=qtyFmt(qty)+' '+a.symbol;}
  }
  document.getElementById('orderSummary').textContent=summary;
@@ -691,7 +692,7 @@ function executeOrder(){
    const spend=Math.min(val,state.cash);
    if(!(spend>0.001)){toast('Недостаточно виртуальных USD.');return;}
    const buyQuote=FrilanceTradeMath.buy(spend,q.price),qty=buyQuote.qty;
-   state.cash=Math.max(0,state.cash-spend);state.holdings[a.id]=holding(a.id)+qty;
+   state.cash=Math.max(0,cents(state.cash-spend));state.holdings[a.id]=holding(a.id)+qty;
    state.costBasis[a.id]=(Number(state.costBasis[a.id])||0)+spend;
    state.trades.unshift({t:Date.now(),side:'BUY',asset:a.id,qty,price:q.price,usd:spend,fee:buyQuote.fee});
    toast('Куплено '+qtyFmt(qty)+' '+a.symbol+' за '+money(spend)+' · цена '+priceFmt(q.price)+' · без комиссии');
@@ -703,7 +704,7 @@ function executeOrder(){
    const basisBefore=Math.max(0,Number(state.costBasis[a.id])||0),costSold=heldBefore>0?basisBefore*(qty/heldBefore):0,realized=proceeds-costSold;
    state.holdings[a.id]=Math.max(0,heldBefore-qty);state.costBasis[a.id]=Math.max(0,basisBefore-costSold);
    if(state.holdings[a.id]<1e-12){delete state.holdings[a.id];delete state.costBasis[a.id];}
-   state.cash+=proceeds;
+   state.cash=cents(state.cash+proceeds);
    state.trades.unshift({t:Date.now(),side:'SELL',asset:a.id,qty,price:q.price,usd:proceeds,fee,costBasisSold:costSold,realizedPnl:realized});
    toast('Продано '+qtyFmt(qty)+' '+a.symbol+' · получено '+money(proceeds)+' · P/L '+(realized>0?'+':'')+money(realized));
  }
@@ -840,3 +841,22 @@ setInterval(()=>{if(!document.hidden)refreshSelectedTick();},1000);
 </script>
 </body>
 </html>
+
+<style>
+/* Final touch-target pass: larger controls and crisp minimalist line icons. */
+.ui-icon{width:28px;height:28px;stroke-width:2}
+.nav-ico{width:38px;height:37px}
+.nav-ico .ui-icon{width:32px;height:32px;stroke-width:1.9}
+.nav-btn{min-height:72px;padding:9px 5px;font-size:10px;gap:7px}
+.dock-btn{min-height:60px;font-size:13px;padding:0 8px;border-radius:12px}
+.dock-btn .ui-icon{width:25px;height:25px}
+.dock-max{font-size:15px}
+.primary-btn{min-height:62px;font-size:16px}
+.quick-btn{min-height:52px;font-size:14px}
+.mode-btn{min-height:50px;font-size:14px}
+.outline-btn{min-height:50px;font-size:13px}
+.tf{min-height:43px;font-size:12px}
+.asset-row{min-height:70px}
+.coin-icon{width:46px;height:46px;font-size:15px}
+@media(max-width:649px){.nav-btn{min-height:66px}.nav-ico{width:34px;height:33px}.nav-ico .ui-icon{width:29px;height:29px}.trade-dock{min-height:78px}.dock-btn{min-height:60px;font-size:12px}.dock-btn .ui-icon{width:23px;height:23px}}
+</style>
