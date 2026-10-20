@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.2
+- Package both Android32 and Android64 binaries in one .geode file.
+
 ## v0.1.1
 - Initialize the trajectory drawing node after gameplay starts.
 - Guard auto-jump scanning if the level object list is unavailable.
