@@ -6,6 +6,10 @@ android {
     namespace "com.frilance.game"
     compileSdk 35
 
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         applicationId "com.frilance.game"
         minSdk 24
