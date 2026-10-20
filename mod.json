@@ -1,6 +1,8 @@
 {
-  "geode": "v5.3.0",
-  "gd": { "android": "2.2081" },
+  "geode": "5.3.0",
+  "gd": {
+    "android": "2.2081"
+  },
   "id": "kirovo389.dualmind",
   "name": "DualMind",
   "version": "v0.1.0",
