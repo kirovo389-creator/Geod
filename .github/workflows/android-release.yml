@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Release tag to create (for example v0.1.4)"
+        description: "Release tag to create (for example v0.1.5)"
         required: true
         default: "v0.1.4"
 
@@ -34,7 +34,7 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           target: ${{ matrix.target }}
-          sdk: "3.9.3"
+          sdk: "5.3.0"
           combine: true
           configure-args: -DCMAKE_PROJECT_INCLUDE=${{ github.workspace }}/.github/patch-geode-sdk.cmake
 
