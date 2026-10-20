@@ -1,0 +1,44 @@
+name: Android Geode release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to create (for example v0.1.0)"
+        required: true
+        default: "v0.1.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Android64 .geode
+        id: geode
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: Android64
+          sdk: latest
+
+      - name: Verify package exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          find "${{ steps.geode.outputs.build-output }}" -maxdepth 1 -name '*.geode' -type f -print
+          test -n "$(find "${{ steps.geode.outputs.build-output }}" -maxdepth 1 -name '*.geode' -type f -print -quit)"
+
+      - name: Publish release and attach .geode
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+          name: DualMind ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+          generate_release_notes: true
+          files: ${{ steps.geode.outputs.build-output }}/*.geode
