@@ -42,7 +42,7 @@ class $modify(DualMindPlayLayer, PlayLayer) {
     void postUpdate(float dt) {
         PlayLayer::postUpdate(dt);
 
-        if (!m_player1 || m_player1->m_isDead || m_isPaused) {
+        if (!m_player1 || m_player1->m_isDead) {
             clearLines();
             return;
         }
@@ -67,7 +67,7 @@ class $modify(DualMindPlayLayer, PlayLayer) {
         float nearest = kLookAhead + 1.f;
         const float playerX = m_player1->getPositionX();
 
-        for (auto* object : CCArrayExt<GameObject*>(m_objects)) {
+        for (auto* object : CCArrayExt<GameObject>(m_objects)) {
             if (!object || object->m_isDisabled || object->m_objectID != kSpikeObjectId) {
                 continue;
             }
