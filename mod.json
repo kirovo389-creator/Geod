@@ -1,11 +1,11 @@
 {
-  "geode": "3.9.3",
+  "geode": "5.3.0",
   "gd": {
     "android": "2.206"
   },
   "id": "kirovo389.dualmind",
   "name": "DualMind",
-  "version": "v0.1.4",
+  "version": "v0.1.5",
   "developer": "kirovo389-creator",
   "description": "Experimental dual-trajectory jump assistant for Geometry Dash 2.206.",
   "settings": {
