@@ -241,6 +241,51 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
 .dock-btn{border:0;border-radius:3px;padding:0 4px;font-size:11px;font-weight:850;white-space:nowrap}.dock-btn:disabled{opacity:.35}.dock-buy{background:#45d8a6;color:#081b13}.dock-sell{background:#ff6572;color:#27080c}.dock-max{background:#252d35;border:1px solid #38414a;color:#c3cbd2}
 .engine-hidden{display:none!important}.toast{bottom:calc(116px + env(safe-area-inset-bottom));background:#141a20;border:1px solid #343d46;border-radius:5px;box-shadow:none}.card{border-radius:6px;box-shadow:none}
 @media(max-width:380px){.chart-topline{grid-template-columns:minmax(68px,1fr) auto 25px;gap:5px;padding-left:7px;padding-right:7px}.chart-current-price{font-size:20px}.chart-asset-names strong{font-size:12px}.chart-meta{gap:3px}.chart-meta .change-chip{font-size:8px}.chart-live-mark{font-size:7px}.dock-btn{font-size:10px}.trade-dock{grid-template-columns:minmax(65px,.9fr) 29px minmax(0,1fr) minmax(0,1fr);gap:4px}}
+
+/* Larger touch targets and clean, minimal vector iconography. */
+.ui-icon{width:22px;height:22px;display:block;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-ico{width:29px;height:28px;display:flex;align-items:center;justify-content:center;line-height:1}
+.nav-ico .ui-icon{width:25px;height:25px;stroke-width:1.75}
+.bottom-nav{padding-top:7px;padding-bottom:calc(7px + env(safe-area-inset-bottom))}
+.nav-btn{min-height:60px;gap:5px;padding:7px 4px;font-size:10px;letter-spacing:.45px}
+.dock-amount-wrap{min-height:48px;padding:0 4px}
+.dock-amount-wrap label{font-size:9px;letter-spacing:.5px}
+#dockAmount{font-size:19px}
+.dock-btn{min-height:49px;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 7px;border-radius:11px;font-size:12px;line-height:1.15}
+.dock-btn .ui-icon{width:19px;height:19px;stroke-width:2}
+.dock-max{font-size:13px;letter-spacing:.3px}
+.dock-buy{background:#40dfaa}.dock-sell{background:#ff6a79}
+.primary-btn{min-height:52px;padding:15px 14px;font-size:14px}
+.quick-btn{min-height:44px;padding:10px 8px;font-size:12px;border-radius:10px}
+.mode-btn{min-height:46px;font-size:13px}
+.outline-btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 13px;font-size:12px}
+.outline-btn .ui-icon{width:18px;height:18px}
+.tf{min-height:39px;padding:9px 12px;font-size:11px}
+.chart-reset,.chart-refresh{width:42px;height:42px;min-width:42px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:10px}
+.chart-reset .ui-icon,.chart-refresh .ui-icon{width:22px;height:22px}
+.asset-row{min-height:63px;padding-top:12px;padding-bottom:12px}
+.coin-icon{width:42px;height:42px;font-size:14px;border-radius:12px}
+.empty-icon{display:flex;align-items:center;justify-content:center;margin:0 auto 9px}
+.empty-icon .ui-icon{width:30px;height:30px}
+.gameover-mark{display:flex;justify-content:center;align-items:center}
+.gameover-mark .ui-icon{width:36px;height:36px;stroke-width:1.6}
+@media(max-width:649px){
+ .trade-dock{grid-template-columns:minmax(56px,.8fr) 40px minmax(0,1fr) minmax(0,1fr);gap:5px;left:5px;right:5px;padding:8px;bottom:calc(70px + env(safe-area-inset-bottom));min-height:66px}
+ .dock-btn{font-size:11px;gap:4px;padding:0 4px;white-space:normal}
+ .dock-btn .ui-icon{width:17px;height:17px}
+ .dock-amount-wrap{padding:0 2px}
+ #dockAmount{font-size:17px}
+ .bottom-nav{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .nav-btn{min-height:59px;font-size:9px}
+ .nav-ico{width:28px;height:27px}
+ .nav-ico .ui-icon{width:24px;height:24px}
+ .chart-wrap .chart-gesture-hint{font-size:9px}
+}
+@media(min-width:650px){
+ .trade-dock{grid-template-columns:minmax(120px,.9fr) 50px minmax(120px,1fr) minmax(120px,1fr);bottom:calc(82px + env(safe-area-inset-bottom));padding:10px;gap:8px}
+ .dock-btn{font-size:13px}
+}
+
 </style>
 </head>
 <body>
@@ -268,7 +313,7 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
       <span class="chart-asset-names"><strong id="selectedName">Bitcoin</strong><small id="selectedTicker">BTC / USD</small></span><span class="switch-caret">⌄</span>
     </button>
     <div class="chart-price-block"><div class="chart-current-price" id="selectedPrice">—</div><div class="chart-meta"><span class="change-chip neutral" id="selectedChange">Ожидание данных</span><span class="chart-live-mark" id="chartSource">API…</span></div></div>
-    <button class="chart-reset" onclick="resetChartView()" aria-label="Сбросить масштаб">↺</button>
+    <button class="chart-reset" onclick="resetChartView()" aria-label="Сбросить масштаб"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 0 2.6-6.4L3 7"/><path d="M3 3v4h4"/></svg></button>
   </div>
   <div class="position-preview" id="positionPreview">Позиция не открыта</div>
   <div class="chart-wrap" id="chartWrap">
@@ -278,13 +323,13 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
   </div>
   <div class="chart-controls">
     <div class="timeframes"><button class="tf active" data-tf="15m">15м</button><button class="tf" data-tf="1h">1ч</button><button class="tf" data-tf="4h">4ч</button><button class="tf" data-tf="1d">1д</button></div>
-    <div class="chart-control-right"><span id="chartUpdatedLabel">LIVE · 1s</span><button class="chart-refresh" onclick="fetchCandles(selectedAsset())" aria-label="Обновить свечи">↻</button></div>
+    <div class="chart-control-right"><span id="chartUpdatedLabel">LIVE · 1s</span><button class="chart-refresh" onclick="fetchCandles(selectedAsset())" aria-label="Обновить свечи"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 1-2.3-5.7L20 7"/></svg></button></div>
   </div>
   <div class="last-trade-banner" id="lastTradeBanner" hidden></div>
 </section>
 
 <section class="view assets-screen" id="view-assets">
-  <div class="assets-head"><div><div class="eyebrow">СПИСОК АКТИВОВ</div><h1>Рынки</h1><div class="sub" id="marketUpdated">Загружаем реальные котировки…</div></div><button class="outline-btn" onclick="refreshPrices(true)">Обновить ↻</button></div>
+  <div class="assets-head"><div><div class="eyebrow">СПИСОК АКТИВОВ</div><h1>Рынки</h1><div class="sub" id="marketUpdated">Загружаем реальные котировки…</div></div><button class="outline-btn" onclick="refreshPrices(true)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M20 12a8 8 0 1 1-2.3-5.7L20 7"/></svg><span>Обновить</span></button></div>
   <section class="asset-list" id="assetList"></section>
   <div class="footer-note">Выбери монету, чтобы открыть график. Сделки виртуальные; цена берётся из публичных источников.</div>
 </section>
@@ -294,7 +339,7 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
   <section class="card trade-card" id="tradeCard">
     <div class="trade-mode"><button class="mode-btn active buy" id="buyMode" onclick="setTradeMode('buy')">КУПИТЬ</button><button class="mode-btn" id="sellMode" onclick="setTradeMode('sell')">ПРОДАТЬ</button></div>
     <label class="amount-label" id="amountLabel" for="orderAmount">Сумма в USD</label><input class="amount-input" type="number" inputmode="decimal" id="orderAmount" min="0" step="0.01" value="5.00"><div class="quick" id="quickButtons"></div>
-    <div class="order-info"><span>Цена</span><strong id="orderPrice">—</strong><span>Комиссия</span><strong>0,10%</strong><span id="orderSummaryLabel">Получишь</span><strong id="orderSummary">—</strong></div>
+    <div class="order-info"><span>Цена</span><strong id="orderPrice">—</strong><span>Комиссия</span><strong>0,00 USD</strong><span id="orderSummaryLabel">Получишь</span><strong id="orderSummary">—</strong></div>
     <button class="primary-btn" id="executeTrade" onclick="executeOrder()" disabled>КУПИТЬ</button>
   </section>
   <section class="card" id="miniHoldings"></section>
@@ -322,30 +367,31 @@ main{max-width:100%;padding:0;margin:0;min-height:0}
 </main>
 
 <nav class="bottom-nav" aria-label="Основная навигация">
-  <button class="nav-btn active" data-view="market" onclick="showView('market')"><span class="nav-ico">⌁</span>ГРАФИК</button>
-  <button class="nav-btn" data-view="assets" onclick="showView('assets')"><span class="nav-ico">◫</span>РЫНОК</button>
-  <button class="nav-btn" data-view="portfolio" onclick="showView('portfolio')"><span class="nav-ico">▤</span>ПОРТФЕЛЬ</button>
-  <button class="nav-btn" data-view="leaderboard" onclick="showView('leaderboard')"><span class="nav-ico">♙</span>РЕЙТИНГ</button>
+  <button class="nav-btn active" data-view="market" onclick="showView('market')"><span class="nav-ico" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 17.5 8.2 12l4 3.2L21 6.5"/><path d="M15.8 6.5H21v5.2"/></svg></span>ГРАФИК</button>
+  <button class="nav-btn" data-view="assets" onclick="showView('assets')"><span class="nav-ico" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 5.5h16M4 12h16M4 18.5h16"/><circle cx="8" cy="5.5" r="1.5"/><circle cx="16" cy="12" r="1.5"/><circle cx="10" cy="18.5" r="1.5"/></svg></span>РЫНОК</button>
+  <button class="nav-btn" data-view="portfolio" onclick="showView('portfolio')"><span class="nav-ico" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="15" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>ПОРТФЕЛЬ</button>
+  <button class="nav-btn" data-view="leaderboard" onclick="showView('leaderboard')"><span class="nav-ico" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg></span>РЕЙТИНГ</button>
 </nav>
 
 <div class="trade-dock" id="tradeDock" aria-label="Быстрая торговля">
   <div class="dock-amount-wrap"><label id="dockAmountLabel" for="dockAmount">Сумма покупки · USD</label><input id="dockAmount" type="number" inputmode="decimal" min="0" step="0.01" value="5.00" aria-label="Сумма покупки в долларах"></div>
   <button class="dock-btn dock-max" id="dockMax" onclick="setMaxBuy()">MAX</button>
-  <button class="dock-btn dock-buy" id="dockBuy" onclick="dockTrade('buy')" disabled>Купить BTC</button>
-  <button class="dock-btn dock-sell" id="dockSell" onclick="dockTrade('sell')" disabled>Продать всё</button>
+  <button class="dock-btn dock-buy" id="dockBuy" onclick="dockTrade('buy')" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg><span>Купить BTC</span></button>
+  <button class="dock-btn dock-sell" id="dockSell" onclick="dockTrade('sell')" disabled><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14V3m0 0 4 4m-4-4L8 7"/><path d="M4 17v3h16v-3"/></svg><span>Продать всё</span></button>
 </div>
 <div id="toast" class="toast" role="status"></div>
 <div id="gameOver" class="game-over" role="dialog" aria-modal="true">
   <div class="gameover-box">
-    <div class="gameover-mark">◈</div><h2>Капитал обнулён</h2>
+    <div class="gameover-mark" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3 22 20H2L12 3Z"/><path d="M12 9v5M12 17h.01"/></svg></div><h2>Капитал обнулён</h2>
     <p>Торговля остановлена. В Frilance нет бонусов, бесплатных пополнений и кнопки сброса.</p>
     <div class="gameover-steps"><strong>Чтобы начать заново:</strong><br>Android → Настройки → Приложения → Frilance → Память → Очистить данные. Весь локальный прогресс будет удалён.</div>
   </div>
 </div>
 
+<script src="trade-math.js"></script>
 <script>
 'use strict';
-const FEE = 0.001;
+const FEE = FrilanceTradeMath.feeRate;
 const ASSETS = [
   {id:'BTC',symbol:'BTC',name:'Bitcoin',source:'binance',pair:'BTCUSDT',icon:'₿'},
   {id:'ETH',symbol:'ETH',name:'Ethereum',source:'binance',pair:'ETHUSDT',icon:'◆'},
@@ -544,9 +590,9 @@ function renderSelected(){
  c.textContent=q?fmtChange(q.change)+' за 24ч':'Ожидание данных';
  document.getElementById('chartSource').textContent=q?(q.stale?'НЕ В СЕТИ':q.source):'ожидание API';
  document.getElementById('orderPrice').textContent=q?priceFmt(q.price):'—';
- const qty=holding(a.id),basis=Math.max(0,Number(state.costBasis[a.id])||0),netNow=q?qty*q.price*(1-FEE):0,preview=document.getElementById('positionPreview');
+ const qty=holding(a.id),basis=Math.max(0,Number(state.costBasis[a.id])||0),netNow=q?FrilanceTradeMath.sell(qty,q.price).proceeds:0,preview=document.getElementById('positionPreview');
  if(qty>0&&q&&q.price>0){const delta=netNow-basis,pct=basis>0?delta/basis*100:0;preview.innerHTML='<span>Позиция '+qtyFmt(qty)+' '+a.symbol+'</span>　<span>Продать всё ≈ '+money(netNow)+'</span>　<span class="'+(delta>=0?'pnl-up':'pnl-down')+'">P/L '+(delta>0?'+':'')+money(delta)+' ('+(pct>0?'+':'')+pct.toFixed(2)+'%)</span>';}
- else preview.textContent='Позиция не открыта · комиссия покупки 0,10%; выручка от продажи зависит от текущей цены';
+ else preview.textContent='Позиция не открыта · комиссия 0,00 USD; сумма продажи зависит от текущей цены';
  const b=document.getElementById('executeTrade');
  b.textContent=state.mode==='buy'?'КУПИТЬ '+a.symbol:'ПРОДАТЬ '+a.symbol;
  b.className='primary-btn'+(state.mode==='sell'?' sell-btn':'');
@@ -555,8 +601,8 @@ function renderSelected(){
  const dock=document.getElementById('dockAmount');
  if(dock&&document.activeElement!==dock)dock.value=document.getElementById('orderAmount').value;
  document.getElementById('dockAmountLabel').textContent=state.mode==='buy'?'Сумма покупки · USD':'Продажа всей позиции';
- document.getElementById('dockBuy').textContent='Купить '+a.symbol;
- document.getElementById('dockSell').textContent=holding(a.id)>0?'Продать всё':'Нет позиции';
+ document.getElementById('dockBuy').querySelector('span').textContent='Купить '+a.symbol;
+ document.getElementById('dockSell').querySelector('span').textContent=holding(a.id)>0?'Продать всё':'Нет позиции';
  document.getElementById('dockBuy').disabled=state.gameOver||!q||q.stale||!(q.price>0)||state.cash<=0.001;
  document.getElementById('dockSell').disabled=state.gameOver||!q||q.stale||!(q.price>0)||holding(a.id)<=0;
  renderLastTrade();
@@ -599,7 +645,7 @@ function updateOrderSummary(){
  const val=Math.max(0,Number(input.value)||0);
  let summary='—';
  if(q&&q.price>0){
-   if(state.mode==='buy'){const spend=Math.min(val,state.cash);summary=spend>0?qtyFmt(spend*(1-FEE)/q.price)+' '+a.symbol:'Недостаточно USD';}
+   if(state.mode==='buy'){const spend=Math.min(val,state.cash);summary=spend>0?qtyFmt(FrilanceTradeMath.buy(spend,q.price).qty)+' '+a.symbol:'Недостаточно USD';}
    else {const qty=holding(a.id)*Math.min(100,val)/100;summary=qtyFmt(qty)+' '+a.symbol;}
  }
  document.getElementById('orderSummary').textContent=summary;
@@ -612,16 +658,16 @@ function executeOrder(){
  if(state.mode==='buy'){
    const spend=Math.min(val,state.cash);
    if(!(spend>0.001)){toast('Недостаточно виртуальных USD.');return;}
-   const qty=spend*(1-FEE)/q.price;
-   state.cash-=spend;state.holdings[a.id]=holding(a.id)+qty;
+   const buyQuote=FrilanceTradeMath.buy(spend,q.price),qty=buyQuote.qty;
+   state.cash=Math.max(0,state.cash-spend);state.holdings[a.id]=holding(a.id)+qty;
    state.costBasis[a.id]=(Number(state.costBasis[a.id])||0)+spend;
-   state.trades.unshift({t:Date.now(),side:'BUY',asset:a.id,qty,price:q.price,usd:spend,fee:spend*FEE});
-   toast('Куплено '+qtyFmt(qty)+' '+a.symbol+' за '+money(spend)+' · цена '+priceFmt(q.price)+' · комиссия '+money(spend*FEE,4));
+   state.trades.unshift({t:Date.now(),side:'BUY',asset:a.id,qty,price:q.price,usd:spend,fee:buyQuote.fee});
+   toast('Куплено '+qtyFmt(qty)+' '+a.symbol+' за '+money(spend)+' · цена '+priceFmt(q.price)+' · без комиссии');
  }else{
    const fraction=Math.min(100,val)/100;
    const qty=holding(a.id)*fraction;
    if(!(qty>0)){toast('Нет позиции для продажи.');return;}
-   const heldBefore=holding(a.id),gross=qty*q.price,fee=gross*FEE,proceeds=gross-fee;
+   const heldBefore=holding(a.id),saleQuote=FrilanceTradeMath.sell(qty,q.price),gross=saleQuote.gross,fee=saleQuote.fee,proceeds=saleQuote.proceeds;
    const basisBefore=Math.max(0,Number(state.costBasis[a.id])||0),costSold=heldBefore>0?basisBefore*(qty/heldBefore):0,realized=proceeds-costSold;
    state.holdings[a.id]=Math.max(0,heldBefore-qty);state.costBasis[a.id]=Math.max(0,basisBefore-costSold);
    if(state.holdings[a.id]<1e-12){delete state.holdings[a.id];delete state.costBasis[a.id];}
@@ -686,7 +732,7 @@ function renderTradeHistory(){
  el.innerHTML=rows.map(t=>{
    const a=assetById(t.asset),buy=t.side==='BUY';
    const dt=new Date(t.t).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-   return '<div class="trade-history-row"><div class="trade-history-left"><span class="trade-tag '+(buy?'buy':'sell')+'">'+(buy?'КУПИЛ':'ПРОДАЛ')+'</span><div class="trade-history-info"><strong>'+a.symbol+' · '+qtyFmt(t.qty)+'</strong><small>'+dt+' · цена '+priceFmt(t.price)+' · комиссия '+money(t.fee||0,4)+'</small></div></div><div class="trade-history-right">'+money(t.usd)+'<small>'+(buy?'потрачено':'получено')+'</small></div></div>';
+   return '<div class="trade-history-row"><div class="trade-history-left"><span class="trade-tag '+(buy?'buy':'sell')+'">'+(buy?'КУПИЛ':'ПРОДАЛ')+'</span><div class="trade-history-info"><strong>'+a.symbol+' · '+qtyFmt(t.qty)+'</strong><small>'+dt+' · цена '+priceFmt(t.price)+' · комиссия '+money(t.fee||0,2)+'</small></div></div><div class="trade-history-right">'+money(t.usd)+'<small>'+(buy?'потрачено':'получено')+'</small></div></div>';
  }).join('');
 }
 function setMaxBuy(){setTradeMode('buy',false);const amount=Math.max(0,state.cash).toFixed(2);document.getElementById('orderAmount').value=amount;document.getElementById('dockAmount').value=amount;updateOrderSummary();}
@@ -708,7 +754,7 @@ function updateVersionLabel(){
 function renderHoldings(elId,compact){
  const el=document.getElementById(elId);
  const rows=ASSETS.filter(a=>holding(a.id)>0);
- if(!rows.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">◌</div>Позиции появятся после первой виртуальной покупки.</div>';return;}
+ if(!rows.length){el.innerHTML='<div class="empty-state"><div class="empty-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 9h17M8 14h3"/></svg></div>Позиции появятся после первой виртуальной покупки.</div>';return;}
  el.innerHTML='<div class="holdings-list">'+rows.map(a=>{
    const qty=holding(a.id),q=prices[a.id],val=q?qty*q.price:0;
    return '<div class="holding-row"><div class="asset-left"><span class="coin-icon coin-'+a.id+'">'+a.icon+'</span><div><div class="asset-symbol">'+a.symbol+'</div><div class="asset-fullname">'+qtyFmt(qty)+' '+a.symbol+'</div></div></div><div><div class="position-value">'+(q?money(val):'—')+'</div><div class="asset-change '+(q?signClass(q.change):'neutral')+'" style="text-align:right">'+(q?fmtChange(q.change):'нет данных')+'</div></div></div>';
