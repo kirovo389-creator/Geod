@@ -22,14 +22,11 @@ concurrency:
 
 jobs:
   build-and-release:
-    name: Build Android APK
+    name: Test and build native Android APK
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
         uses: actions/checkout@v4
-
-      - name: Run trade math tests
-        run: node app/src/test/js/trade-math.test.cjs
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -67,8 +64,8 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Build APK
-        run: gradle --no-daemon --stacktrace assembleDebug
+      - name: Run Java trade tests and build APK
+        run: gradle --no-daemon --stacktrace testDebugUnitTest assembleDebug
 
       - name: Prepare release asset
         run: |
@@ -93,13 +90,14 @@ jobs:
           tag_name: frilance-v1.0.${{ github.run_number }}
           name: Frilance Android v1.0.${{ github.run_number }}
           body: |
-            Frilance — Android crypto-market simulation.
+            Frilance — native Java Android crypto-market simulator.
 
             - Starting balance: $5.00 virtual cash
-            - Live public market quotes and one-second selected-price refresh
-            - Quick buy/sell dock and transaction history
-            - In-app update checker
-            - Local-only progress and leaderboard
+            - Native Java interface; no HTML or WebView
+            - Live public prices and native candlestick chart
+            - Precise fractional positions and full sale proceeds
+            - Separate market and portfolio tabs
+            - Six-hour cooldown for large-drop notifications
             - No real-money trades, deposits, or rewards
 
             This APK is debug-signed for direct installation.

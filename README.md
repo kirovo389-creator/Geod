@@ -1,28 +1,24 @@
 # Frilance
 
-Frilance is an Android-only, local crypto-market simulator. It starts with **$5.00 of virtual cash** and has no deposits, rewards, or real exchange orders.
+Frilance is a native Java Android crypto-market simulator. It starts with **$5.00 of virtual cash** and never sends orders to a real exchange.
 
 ## Features
-- Dark exchange-inspired interface with a candlestick chart.
+- Native Android interface built in Java; no HTML, JavaScript, or WebView.
+- A chart that fills the available screen without vertical scrolling, with separate Market and Portfolio tabs.
 - Public market quotes from Binance for BTC, ETH, TON, NOT and DOGE.
-- Public DEX market lookup through DexScreener for GRAM and BECAUSE; if no liquid market is found, the asset remains unavailable rather than showing a fabricated quote.
-- Virtual fractional buy/sell orders with zero commission; sale proceeds are rounded to cents.
-- Locally stored balance and positions, plus a local-only leaderboard with generated opponents.
-- Bankruptcy freezes play. There is no in-game restart or refill; clear Frilance app data in Android settings to start from a clean installation state.
+- Public DEX market lookup through DexScreener for GRAM and BECAUSE. If a valid quote is not found, the app does not invent one.
+- High-precision fractional positions and virtual buy/sell orders with no intermediate cent rounding.
+- Portfolio equity includes available cash plus the current market value of open positions.
+- Persistent virtual cash, holdings, cost basis and transaction history.
+- Notification when an asset's reported 24-hour change is at or below -15%, with a six-hour cooldown per asset.
+- In-app update checks for published APK releases.
+
+## Trading math
+
+Wallet amounts and positions are kept as decimal strings and calculated with BigDecimal. Display formatting does not change the stored amount. For example, buying $5 of an asset at $100 creates 0.05 units; if its price later reaches $128, the position is worth $6.40 before sale. Selling credits the full calculated proceeds to virtual cash. Very small quantities remain small quantities—their gains and losses are proportional to the amount held.
 
 ## Build
-The workflow in `.github/workflows/android-release.yml` builds an installable debug-signed APK and attaches it to a versioned GitHub Release. It runs after relevant pushes to `main`, or can be started manually from the Actions tab.
 
-The app requires an internet connection for live quotes. All orders are virtual and are never sent to a real exchange. This is a game, not financial advice.
+The workflow in .github/workflows/android-release.yml runs Java unit tests, builds a debug-signed APK, and attaches it to a versioned GitHub Release after relevant pushes to main. It can also be started manually from the Actions tab.
 
-## Data notes
-- Exchange ticker and candlestick API: Binance public market data.
-- DEX token lookup: DexScreener public search API.
-- The local leaderboard is not connected to other devices or players.
-
-
-## Trading screen and updates
-
-The market screen keeps the virtual cash balance in the top bar, expands the selected-asset chart, and pins quick buy/sell controls above navigation. Completed trades appear in a persistent last-trade label and in the local transaction history.
-
-The selected Binance price is polled once per second while the app is open; the remaining market list is refreshed less often to avoid unnecessary public API requests. New APK releases are checked automatically at launch and periodically while the app stays open. Android still requires the user to confirm APK installation. The CI keeps a stable debug signing key through a GitHub Actions cache so builds made with that key can update one another. APKs published before the stable key was introduced were signed differently; Android cannot update those in place. For the one-time signature migration, uninstall the old Frilance app, install the latest APK, then later updates should install normally. Uninstalling removes locally saved game progress.
+All market data is fetched from public Binance and DexScreener APIs. An internet connection is required for fresh quotes. This is a simulator, not financial advice.

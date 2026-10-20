@@ -16,7 +16,7 @@ android {
         targetSdk 34
         def releaseNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
         versionCode releaseNumber
-        versionName "1.0.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
+        versionName "1.0." + (System.getenv('GITHUB_RUN_NUMBER') ?: '0')
     }
 
     compileOptions {
@@ -26,6 +26,6 @@ android {
 }
 
 dependencies {
-    implementation "androidx.webkit:webkit:1.12.1"
     implementation "androidx.core:core:1.15.0"
+    testImplementation "junit:junit:4.13.2"
 }
