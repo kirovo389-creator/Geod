@@ -20,4 +20,4 @@ close(trade.sell(purchase.qty, 20).fee, 0, 'Selling has no fee');
 assert.deepEqual(trade.buy(5, 0), { qty: 0, fee: 0, cost: 0 }, 'Zero price must not create a position');
 assert.deepEqual(trade.sell(0.05, 0), { gross: 0, fee: 0, proceeds: 0 }, 'Zero price must return zero');
 
-console.log('Trade math tests passed (8 checks).');
+console.log('Trade math tests passed (9 checks).');
