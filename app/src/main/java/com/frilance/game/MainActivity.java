@@ -103,8 +103,6 @@ public final class MainActivity extends Activity {
             new Asset("AVAX", "Avalanche", "AVAX", "AVAXUSDT", "binance", "", "A")
     );
 
-    );
-
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService marketExecutor = Executors.newFixedThreadPool(4);
     private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
