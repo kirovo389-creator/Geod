@@ -10,7 +10,7 @@ API_HASH = os.getenv("TELEGRAM_API_HASH", "").strip()
 # Session file stays on the machine running this MCP process.
 SESSION_TXT = os.getenv(
     "TELEGRAM_SESSION_TXT",
-    str(Path.home() / ".telegram-readonly" / "session.txt"),
+    str(Path(__file__).resolve().parent.parent / "session.txt"),
 ).strip()
 SESSION_PATH = os.getenv(
     "TELEGRAM_SESSION_PATH",
