@@ -2,9 +2,6 @@ name: Reset Geod and install Telegram Read-Only plugin
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/reset-and-install-telegram-plugin.yml"
 
 permissions:
   contents: write
