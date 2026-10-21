@@ -16,7 +16,7 @@ android {
         targetSdk 34
         def releaseNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
         // Reserve a higher range so upgrades replace older local/debug builds too.
-        versionCode 1000 + releaseNumber
+        versionCode (1000 + releaseNumber)
         versionName "1.0." + releaseNumber
     }
 
