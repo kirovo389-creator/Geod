@@ -119,7 +119,6 @@ public final class MainActivity extends Activity {
     private String selectedAssetId = "BTC";
     private String currentTab = "chart";
     private String currentInterval = "15m";
-    private String amountMode = "USD";
     private long lastAllMarketRefresh;
     private long lastCandleRefresh;
     private boolean updateCheckRunning;
@@ -138,9 +137,7 @@ public final class MainActivity extends Activity {
     private TextView selectedPriceText;
     private TextView selectedChangeText;
     private TextView selectedPositionText;
-    private TextView amountModeButton;
     private EditText amountInput;
-    private EditText durationInput;
     private NativeChartView chartView;
     private ScrollView marketScroll;
     private final Map<String, TextView> marketPriceViews = new HashMap<>();
@@ -334,7 +331,7 @@ public final class MainActivity extends Activity {
         wallet.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         headerEquity = text("$5.00", 18, MINT, true);
         headerEquity.setGravity(Gravity.RIGHT);
-        headerCash = text("ДОСТУПНО $5.00", 9, MUTED, true);
+        headerCash = text("ПОРТФЕЛЬ $5.00", 9, MUTED, true);
         headerCash.setGravity(Gravity.RIGHT);
         wallet.addView(headerEquity);
         wallet.addView(headerCash);
@@ -348,10 +345,6 @@ public final class MainActivity extends Activity {
         dock.setPadding(dp(12), dp(9), dp(12), dp(10));
         dock.setBackground(background(PANEL, 0, LINE));
 
-        LinearLayout inputRow = new LinearLayout(this);
-        inputRow.setGravity(Gravity.CENTER_VERTICAL);
-        inputRow.setOrientation(LinearLayout.HORIZONTAL);
-
         amountInput = new EditText(this);
         amountInput.setTextColor(WHITE);
         amountInput.setHintTextColor(MUTED);
@@ -363,24 +356,7 @@ public final class MainActivity extends Activity {
         amountInput.setHint("Сумма в USD");
         amountInput.setText("1.00");
         amountInput.setBackground(background(Color.rgb(9, 16, 23), 10, LINE));
-        inputRow.addView(amountInput, new LinearLayout.LayoutParams(0, dp(43), 1f));
-
-        durationInput = new EditText(this);
-        durationInput.setTextColor(WHITE);
-        durationInput.setHintTextColor(MUTED);
-        durationInput.setTextSize(14);
-        durationInput.setSingleLine(true);
-        durationInput.setSelectAllOnFocus(true);
-        durationInput.setGravity(Gravity.CENTER);
-        durationInput.setInputType(InputType.TYPE_CLASS_NUMBER);
-        durationInput.setPadding(dp(5), 0, dp(5), 0);
-        durationInput.setHint("сек");
-        durationInput.setText("5");
-        durationInput.setBackground(background(Color.rgb(9, 16, 23), 10, LINE));
-        LinearLayout.LayoutParams durationParams = new LinearLayout.LayoutParams(dp(76), dp(43));
-        durationParams.leftMargin = dp(7);
-        inputRow.addView(durationInput, durationParams);
-        dock.addView(inputRow);
+        dock.addView(amountInput, new LinearLayout.LayoutParams(-1, dp(43)));
 
         LinearLayout actionRow = new LinearLayout(this);
         actionRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -777,17 +753,6 @@ public final class MainActivity extends Activity {
         }
 
         if (buy) {
-            int durationSeconds;
-            try {
-                durationSeconds = Integer.parseInt(durationInput.getText().toString().trim());
-                if (durationSeconds < 1 || durationSeconds > 3600) {
-                    throw new NumberFormatException("duration out of range");
-                }
-            } catch (Exception e) {
-                toast("Укажи длительность от 1 до 3600 секунд.");
-                return;
-            }
-
             BigDecimal amount = entered;
             if (amount.compareTo(cash) > 0) {
                 toast("Недостаточно виртуальных средств. Доступно " + money(cash));
@@ -808,9 +773,6 @@ public final class MainActivity extends Activity {
             updateHeader();
             updateSelectedStats();
             updateChart();
-            scheduleTimedClose(asset.id, qty, durationSeconds);
-            toast("Куплено " + quantity(qty) + " " + asset.symbol + " за " + money(amount)
-                    + ". Автопродажа через " + durationSeconds + " сек.");
             return;
         }
 
@@ -849,111 +811,11 @@ public final class MainActivity extends Activity {
         updateHeader();
         updateSelectedStats();
         updateChart();
-        toast("Продано на " + money(amount) + " · результат " + signedMoney(pnl));
-    }
-
-    private void scheduleTimedClose(String assetId, BigDecimal quantity, int durationSeconds) {
-        handler.postDelayed(() -> {
-            if (isFinishing()) return;
-            Asset asset = assetById(assetId);
-            marketExecutor.execute(() -> {
-                Quote latest = null;
-                try {
-                    latest = fetchQuote(asset);
-                } catch (Exception ignored) { }
-                Quote freshQuote = latest;
-                handler.post(() -> {
-                    if (isFinishing()) return;
-                    if (freshQuote != null) {
-                        quotes.put(assetId, freshQuote);
-                        List<BigDecimal> series = recentPrices.get(assetId);
-                        if (series != null) {
-                            series.add(freshQuote.price);
-                            while (series.size() > 120) series.remove(0);
-                        }
-                        savePriceCache();
-                        updateMarketRows();
-                    }
-                    closeTimedPosition(assetId, quantity);
-                });
-            });
-        }, durationSeconds * 1000L);
-    }
-
-    private void closeTimedPosition(String assetId, BigDecimal requestedQuantity) {
-        Asset asset = assetById(assetId);
-        Quote quote = quoteFor(asset);
-        BigDecimal held = holding(assetId);
-        if (held.signum() <= 0) {
-            toast("Таймер завершён: позиция уже закрыта.");
-            return;
-        }
-        if (quote == null || quote.price.signum() <= 0) {
-            toast("Таймер завершён, но цена недоступна. Позиция оставлена открытой.");
-            requestQuote(asset);
-            return;
-        }
-
-        BigDecimal qty = requestedQuantity.min(held);
-        if (qty.signum() <= 0) return;
-        BigDecimal amount = TradeMath.marketValue(qty, quote.price);
-        BigDecimal oldBasis = basis(assetId);
-        BigDecimal soldBasis = TradeMath.soldCostBasis(oldBasis, qty, held);
-        BigDecimal pnl = amount.subtract(soldBasis);
-        cash = TradeMath.cashAfterSale(cash, qty, quote.price);
-        BigDecimal remainingQty = held.subtract(qty);
-        BigDecimal remainingBasis = oldBasis.subtract(soldBasis);
-        if (remainingQty.signum() == 0) {
-            holdings.remove(assetId);
-            costBasis.remove(assetId);
-        } else {
-            holdings.put(assetId, remainingQty);
-            costBasis.put(assetId, remainingBasis.max(BigDecimal.ZERO));
-        }
-
-        trades.add(0, new Trade(System.currentTimeMillis(), "SELL", assetId, qty, quote.price, amount, pnl));
-        trimTrades();
-        saveState();
-        updateHeader();
-        updateSelectedStats();
-        updateChart();
-        updateMarketRows();
-        toast("Автопродажа " + asset.symbol + " · " + money(amount) + " · результат " + signedMoney(pnl));
-    }
-
-    private void toggleAmountMode() {
-        amountMode = amountMode.equals("USD") ? "COIN" : "USD";
-        amountModeButton.setText(amountMode);
-        amountInput.setHint(amountMode.equals("USD") ? "Сумма в долларах" : "Количество монет");
-        amountInput.setText("");
-        amountInput.requestFocus();
-    }
-
-    private void fillMaxCash() {
-        amountMode = "USD";
-        amountModeButton.setText(amountMode);
-        amountInput.setHint("Сумма в долларах");
-        amountInput.setText(moneyNumber(cash));
-        amountInput.setSelection(amountInput.getText().length());
-    }
-
-    private void fillAllPosition() {
-        Asset asset = assetById(selectedAssetId);
-        BigDecimal qty = holding(asset.id);
-        if (qty.signum() <= 0) {
-            toast("Нет открытой позиции для продажи.");
-            return;
-        }
-        amountMode = "COIN";
-        amountModeButton.setText(amountMode);
-        amountInput.setHint("Количество монет");
-        amountInput.setText(qty.stripTrailingZeros().toPlainString());
-        amountInput.setSelection(amountInput.getText().length());
     }
 
     private void updateHeader() {
-        if (headerEquity != null) headerEquity.setText(money(totalEquity()));
-        if (headerCash != null) headerCash.setText("ДОСТУПНО " + money(cash));
+        if (headerEquity != null) headerEquity.setText(money(cash));
+        if (headerCash != null) headerCash.setText("ПОРТФЕЛЬ " + money(totalEquity()));
         if (headerLive != null) headerLive.setText("LIVE");
     }
 
