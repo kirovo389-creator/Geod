@@ -30,6 +30,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -75,8 +76,8 @@ public final class MainActivity extends Activity {
     private static final int INSTALL_PERMISSION_REQUEST = 741;
     private static final int NOTIFICATION_PERMISSION_REQUEST = 742;
     private static final long UPDATE_CHECK_INTERVAL = 6L * 60L * 60L * 1000L;
-    private static final long MARKET_REFRESH_MS = 5_000L;
-    private static final long ALL_MARKETS_REFRESH_MS = 30_000L;
+    private static final long MARKET_REFRESH_MS = 3_000L;
+    private static final long ALL_MARKETS_REFRESH_MS = 15_000L;
     private static final long DROP_ALERT_COOLDOWN_MS = 6L * 60L * 60L * 1000L;
 
     private static final int BG = Color.rgb(8, 13, 19);
@@ -92,11 +93,16 @@ public final class MainActivity extends Activity {
     private final List<Asset> assets = Arrays.asList(
             new Asset("BTC", "Bitcoin", "BTC", "BTCUSDT", "binance", "", "₿"),
             new Asset("ETH", "Ethereum", "ETH", "ETHUSDT", "binance", "", "◆"),
-            new Asset("TON", "Toncoin", "TON", "TONUSDT", "binance", "", "T"),
-            new Asset("NOT", "Notcoin", "NOT", "NOTUSDT", "binance", "", "N"),
+            new Asset("SOL", "Solana", "SOL", "SOLUSDT", "binance", "", "S"),
+            new Asset("BNB", "BNB", "BNB", "BNBUSDT", "binance", "", "B"),
+            new Asset("XRP", "XRP", "XRP", "XRPUSDT", "binance", "", "X"),
             new Asset("DOGE", "Dogecoin", "DOGE", "DOGEUSDT", "binance", "", "Ð"),
-            new Asset("GRAM", "Gram", "GRAM", "", "dex", "GRAM", "G"),
-            new Asset("BECAUSE", "Because", "BECAUSE", "", "dex", "BECAUSE", "B")
+            new Asset("ADA", "Cardano", "ADA", "ADAUSDT", "binance", "", "A"),
+            new Asset("LINK", "Chainlink", "LINK", "LINKUSDT", "binance", "", "L"),
+            new Asset("TRX", "TRON", "TRX", "TRXUSDT", "binance", "", "T"),
+            new Asset("AVAX", "Avalanche", "AVAX", "AVAXUSDT", "binance", "", "A")
+    );
+
     );
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -136,6 +142,7 @@ public final class MainActivity extends Activity {
     private TextView selectedPositionText;
     private TextView amountModeButton;
     private EditText amountInput;
+    private EditText durationInput;
     private NativeChartView chartView;
     private ScrollView marketScroll;
     private final Map<String, TextView> marketPriceViews = new HashMap<>();
@@ -343,9 +350,9 @@ public final class MainActivity extends Activity {
         dock.setPadding(dp(12), dp(9), dp(12), dp(10));
         dock.setBackground(background(PANEL, 0, LINE));
 
-        LinearLayout amountRow = new LinearLayout(this);
-        amountRow.setGravity(Gravity.CENTER_VERTICAL);
-        amountRow.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout inputRow = new LinearLayout(this);
+        inputRow.setGravity(Gravity.CENTER_VERTICAL);
+        inputRow.setOrientation(LinearLayout.HORIZONTAL);
 
         amountInput = new EditText(this);
         amountInput.setTextColor(WHITE);
@@ -355,29 +362,27 @@ public final class MainActivity extends Activity {
         amountInput.setSelectAllOnFocus(true);
         amountInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         amountInput.setPadding(dp(12), 0, dp(8), 0);
-        amountInput.setHint("Сумма сделки");
-        amountInput.setText("1");
+        amountInput.setHint("Сумма в USD");
+        amountInput.setText("1.00");
         amountInput.setBackground(background(Color.rgb(9, 16, 23), 10, LINE));
-        amountRow.addView(amountInput, new LinearLayout.LayoutParams(0, dp(43), 1f));
+        inputRow.addView(amountInput, new LinearLayout.LayoutParams(0, dp(43), 1f));
 
-        amountModeButton = button("USD", PANEL_HI, WHITE);
-        amountModeButton.setOnClickListener(v -> toggleAmountMode());
-        LinearLayout.LayoutParams modeParams = new LinearLayout.LayoutParams(dp(72), dp(43));
-        modeParams.leftMargin = dp(7);
-        amountRow.addView(amountModeButton, modeParams);
-
-        Button maxCashButton = button("MAX $", PANEL_HI, MINT);
-        maxCashButton.setOnClickListener(v -> fillMaxCash());
-        LinearLayout.LayoutParams maxCashParams = new LinearLayout.LayoutParams(dp(58), dp(43));
-        maxCashParams.leftMargin = dp(5);
-        amountRow.addView(maxCashButton, maxCashParams);
-
-        Button allCoinsButton = button("ВСЁ", PANEL_HI, WHITE);
-        allCoinsButton.setOnClickListener(v -> fillAllPosition());
-        LinearLayout.LayoutParams allCoinsParams = new LinearLayout.LayoutParams(dp(52), dp(43));
-        allCoinsParams.leftMargin = dp(5);
-        amountRow.addView(allCoinsButton, allCoinsParams);
-        dock.addView(amountRow);
+        durationInput = new EditText(this);
+        durationInput.setTextColor(WHITE);
+        durationInput.setHintTextColor(MUTED);
+        durationInput.setTextSize(14);
+        durationInput.setSingleLine(true);
+        durationInput.setSelectAllOnFocus(true);
+        durationInput.setGravity(Gravity.CENTER);
+        durationInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        durationInput.setPadding(dp(5), 0, dp(5), 0);
+        durationInput.setHint("сек");
+        durationInput.setText("5");
+        durationInput.setBackground(background(Color.rgb(9, 16, 23), 10, LINE));
+        LinearLayout.LayoutParams durationParams = new LinearLayout.LayoutParams(dp(76), dp(43));
+        durationParams.leftMargin = dp(7);
+        inputRow.addView(durationInput, durationParams);
+        dock.addView(inputRow);
 
         LinearLayout actionRow = new LinearLayout(this);
         actionRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -536,7 +541,6 @@ public final class MainActivity extends Activity {
         screen.addView(timeframeRow);
 
         screenHost.addView(screen, new FrameLayout.LayoutParams(-1, -1));
-        amountModeButton.setText(amountMode);
     }
 
     private void renderMarketScreen() {
@@ -760,41 +764,43 @@ public final class MainActivity extends Activity {
             requestQuote(asset);
             return;
         }
+
         BigDecimal entered;
         try {
             String input = amountInput.getText().toString().trim().replace(',', '.');
-            entered = new BigDecimal(input);
+            entered = new BigDecimal(input).setScale(2, RoundingMode.HALF_UP);
         } catch (Exception e) {
-            toast("Введи корректную сумму или количество.");
+            toast("Введи корректную сумму в долларах.");
             return;
         }
         if (entered.signum() <= 0) {
-            toast("Значение должно быть больше нуля.");
+            toast("Сумма должна быть не меньше $0.01.");
             return;
         }
 
-        BigDecimal qty;
-        BigDecimal amount;
         if (buy) {
-            if (amountMode.equals("USD")) {
-                amount = entered;
-                if (amount.compareTo(cash) > 0) {
-                    toast("Недостаточно виртуальных средств. Доступно " + money(cash));
-                    return;
+            int durationSeconds;
+            try {
+                durationSeconds = Integer.parseInt(durationInput.getText().toString().trim());
+                if (durationSeconds < 1 || durationSeconds > 3600) {
+                    throw new NumberFormatException("duration out of range");
                 }
-                qty = TradeMath.quantityForCash(amount, quote.price);
-            } else {
-                qty = entered;
-                amount = TradeMath.marketValue(qty, quote.price);
-                if (amount.compareTo(cash) > 0) {
-                    toast("Для покупки нужно " + money(amount) + ", доступно " + money(cash));
-                    return;
-                }
+            } catch (Exception e) {
+                toast("Укажи длительность от 1 до 3600 секунд.");
+                return;
             }
+
+            BigDecimal amount = entered;
+            if (amount.compareTo(cash) > 0) {
+                toast("Недостаточно виртуальных средств. Доступно " + money(cash));
+                return;
+            }
+            BigDecimal qty = TradeMath.quantityForCash(amount, quote.price);
             if (qty.signum() <= 0 || amount.signum() <= 0) {
                 toast("Сумма слишком мала для расчёта.");
                 return;
             }
+
             cash = cash.subtract(amount);
             holdings.put(asset.id, holding(asset.id).add(qty));
             costBasis.put(asset.id, basis(asset.id).add(amount));
@@ -804,48 +810,117 @@ public final class MainActivity extends Activity {
             updateHeader();
             updateSelectedStats();
             updateChart();
-            toast("Куплено " + quantity(qty) + " " + asset.symbol + " за " + money(amount));
-        } else {
-            BigDecimal held = holding(asset.id);
-            if (held.signum() <= 0) {
-                toast("У тебя нет " + asset.symbol + " для продажи.");
-                return;
-            }
-            if (amountMode.equals("USD")) {
-                qty = entered.divide(quote.price, 36, RoundingMode.DOWN);
-            } else {
-                qty = entered;
-            }
-            if (qty.compareTo(held) > 0) {
-                toast("Количество больше позиции. Нажми MAX, чтобы продать всё.");
-                return;
-            }
-            if (qty.signum() <= 0) {
-                toast("Сумма слишком мала для расчёта.");
-                return;
-            }
-            amount = TradeMath.marketValue(qty, quote.price);
-            BigDecimal oldBasis = basis(asset.id);
-            BigDecimal soldBasis = TradeMath.soldCostBasis(oldBasis, qty, held);
-            BigDecimal pnl = amount.subtract(soldBasis);
-            cash = TradeMath.cashAfterSale(cash, qty, quote.price);
-            BigDecimal remainingQty = held.subtract(qty);
-            BigDecimal remainingBasis = oldBasis.subtract(soldBasis);
-            if (remainingQty.signum() == 0) {
-                holdings.remove(asset.id);
-                costBasis.remove(asset.id);
-            } else {
-                holdings.put(asset.id, remainingQty);
-                costBasis.put(asset.id, remainingBasis.max(BigDecimal.ZERO));
-            }
-            trades.add(0, new Trade(System.currentTimeMillis(), "SELL", asset.id, qty, quote.price, amount, pnl));
-            trimTrades();
-            saveState();
-            updateHeader();
-            updateSelectedStats();
-            updateChart();
-            toast("Продано на " + money(amount) + " · результат " + signedMoney(pnl));
+            scheduleTimedClose(asset.id, qty, durationSeconds);
+            toast("Куплено " + quantity(qty) + " " + asset.symbol + " за " + money(amount)
+                    + ". Автопродажа через " + durationSeconds + " сек.");
+            return;
         }
+
+        BigDecimal held = holding(asset.id);
+        if (held.signum() <= 0) {
+            toast("У тебя нет " + asset.symbol + " для продажи.");
+            return;
+        }
+        BigDecimal qty = entered.divide(quote.price, 36, RoundingMode.DOWN);
+        if (qty.compareTo(held) > 0) {
+            toast("Сумма превышает стоимость открытой позиции.");
+            return;
+        }
+        if (qty.signum() <= 0) {
+            toast("Сумма слишком мала для расчёта.");
+            return;
+        }
+
+        BigDecimal amount = TradeMath.marketValue(qty, quote.price);
+        BigDecimal oldBasis = basis(asset.id);
+        BigDecimal soldBasis = TradeMath.soldCostBasis(oldBasis, qty, held);
+        BigDecimal pnl = amount.subtract(soldBasis);
+        cash = TradeMath.cashAfterSale(cash, qty, quote.price);
+        BigDecimal remainingQty = held.subtract(qty);
+        BigDecimal remainingBasis = oldBasis.subtract(soldBasis);
+        if (remainingQty.signum() == 0) {
+            holdings.remove(asset.id);
+            costBasis.remove(asset.id);
+        } else {
+            holdings.put(asset.id, remainingQty);
+            costBasis.put(asset.id, remainingBasis.max(BigDecimal.ZERO));
+        }
+        trades.add(0, new Trade(System.currentTimeMillis(), "SELL", asset.id, qty, quote.price, amount, pnl));
+        trimTrades();
+        saveState();
+        updateHeader();
+        updateSelectedStats();
+        updateChart();
+        toast("Продано на " + money(amount) + " · результат " + signedMoney(pnl));
+    }
+
+    private void scheduleTimedClose(String assetId, BigDecimal quantity, int durationSeconds) {
+        handler.postDelayed(() -> {
+            if (isFinishing()) return;
+            Asset asset = assetById(assetId);
+            marketExecutor.execute(() -> {
+                Quote latest = null;
+                try {
+                    latest = fetchQuote(asset);
+                } catch (Exception ignored) { }
+                Quote freshQuote = latest;
+                handler.post(() -> {
+                    if (isFinishing()) return;
+                    if (freshQuote != null) {
+                        quotes.put(assetId, freshQuote);
+                        List<BigDecimal> series = recentPrices.get(assetId);
+                        if (series != null) {
+                            series.add(freshQuote.price);
+                            while (series.size() > 120) series.remove(0);
+                        }
+                        savePriceCache();
+                        updateMarketRows();
+                    }
+                    closeTimedPosition(assetId, quantity);
+                });
+            });
+        }, durationSeconds * 1000L);
+    }
+
+    private void closeTimedPosition(String assetId, BigDecimal requestedQuantity) {
+        Asset asset = assetById(assetId);
+        Quote quote = quoteFor(asset);
+        BigDecimal held = holding(assetId);
+        if (held.signum() <= 0) {
+            toast("Таймер завершён: позиция уже закрыта.");
+            return;
+        }
+        if (quote == null || quote.price.signum() <= 0) {
+            toast("Таймер завершён, но цена недоступна. Позиция оставлена открытой.");
+            requestQuote(asset);
+            return;
+        }
+
+        BigDecimal qty = requestedQuantity.min(held);
+        if (qty.signum() <= 0) return;
+        BigDecimal amount = TradeMath.marketValue(qty, quote.price);
+        BigDecimal oldBasis = basis(assetId);
+        BigDecimal soldBasis = TradeMath.soldCostBasis(oldBasis, qty, held);
+        BigDecimal pnl = amount.subtract(soldBasis);
+        cash = TradeMath.cashAfterSale(cash, qty, quote.price);
+        BigDecimal remainingQty = held.subtract(qty);
+        BigDecimal remainingBasis = oldBasis.subtract(soldBasis);
+        if (remainingQty.signum() == 0) {
+            holdings.remove(assetId);
+            costBasis.remove(assetId);
+        } else {
+            holdings.put(assetId, remainingQty);
+            costBasis.put(assetId, remainingBasis.max(BigDecimal.ZERO));
+        }
+
+        trades.add(0, new Trade(System.currentTimeMillis(), "SELL", assetId, qty, quote.price, amount, pnl));
+        trimTrades();
+        saveState();
+        updateHeader();
+        updateSelectedStats();
+        updateChart();
+        updateMarketRows();
+        toast("Автопродажа " + asset.symbol + " · " + money(amount) + " · результат " + signedMoney(pnl));
     }
 
     private void toggleAmountMode() {
@@ -1266,23 +1341,13 @@ public final class MainActivity extends Activity {
     }
 
     private static String money(BigDecimal value) {
-        if (value == null || value.signum() == 0) return "$0.00";
-        BigDecimal abs = value.abs();
-        BigDecimal exact = value.stripTrailingZeros();
-        if (abs.compareTo(new BigDecimal("0.000001")) < 0) {
-            return "$" + exact.toPlainString();
-        }
-        if (exact.scale() > 6 && abs.compareTo(new BigDecimal("1000000000000")) < 0) {
-            return "$" + exact.toPlainString();
-        }
-        BigDecimal shown = value.setScale(6, RoundingMode.HALF_UP).stripTrailingZeros();
-        if (shown.scale() < 2) shown = shown.setScale(2);
+        BigDecimal shown = (value == null ? BigDecimal.ZERO : value).setScale(2, RoundingMode.HALF_UP);
         return "$" + shown.toPlainString();
     }
 
     private static String moneyNumber(BigDecimal value) {
-        if (value == null) return "0";
-        return value.stripTrailingZeros().toPlainString();
+        if (value == null) return "0.00";
+        return value.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
     private static String signedMoney(BigDecimal value) {
@@ -1516,10 +1581,41 @@ public final class MainActivity extends Activity {
         private List<Candle> candles = new ArrayList<>();
         private List<BigDecimal> points = new ArrayList<>();
         private BigDecimal latest = BigDecimal.ZERO;
+        private float zoomFactor = 1f;
+        private final ScaleGestureDetector scaleDetector;
 
         NativeChartView(Context context) {
             super(context);
             setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            scaleDetector = new ScaleGestureDetector(context,
+                    new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                        @Override
+                        public boolean onScale(ScaleGestureDetector detector) {
+                            zoomFactor = Math.max(1f, Math.min(8f, zoomFactor * detector.getScaleFactor()));
+                            invalidate();
+                            return true;
+                        }
+                    });
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            scaleDetector.onTouchEvent(event);
+            return true;
+        }
+
+        private List<Candle> visibleCandles() {
+            if (candles.isEmpty()) return candles;
+            int count = Math.max(6, (int) Math.ceil(candles.size() / zoomFactor));
+            int start = Math.max(0, candles.size() - count);
+            return candles.subList(start, candles.size());
+        }
+
+        private List<BigDecimal> visiblePoints() {
+            if (points.isEmpty()) return points;
+            int count = Math.max(6, (int) Math.ceil(points.size() / zoomFactor));
+            int start = Math.max(0, points.size() - count);
+            return points.subList(start, points.size());
         }
 
         void setData(List<Candle> data, List<BigDecimal> series, BigDecimal current) {
@@ -1542,14 +1638,16 @@ public final class MainActivity extends Activity {
             float bottom = h - dp(23);
             if (bottom <= top) return;
 
+            List<Candle> visibleCandleData = visibleCandles();
+            List<BigDecimal> visiblePointData = visiblePoints();
             ArrayList<BigDecimal> values = new ArrayList<>();
-            if (!candles.isEmpty()) {
-                for (Candle candle : candles) {
+            if (!visibleCandleData.isEmpty()) {
+                for (Candle candle : visibleCandleData) {
                     values.add(candle.high);
                     values.add(candle.low);
                 }
             } else {
-                values.addAll(points);
+                values.addAll(visiblePointData);
             }
             if (latest.signum() > 0) values.add(latest);
             if (values.isEmpty()) {
@@ -1597,8 +1695,8 @@ public final class MainActivity extends Activity {
                 paint.setColor(Color.rgb(26, 37, 47));
             }
 
-            if (candles.size() >= 2) drawCandles(canvas, left, right, top, bottom, low, span);
-            else drawLine(canvas, left, right, top, bottom, low, span);
+            if (visibleCandleData.size() >= 2) drawCandles(canvas, left, right, top, bottom, low, span, visibleCandleData);
+            else drawLine(canvas, left, right, top, bottom, low, span, visiblePointData);
 
             if (latest.signum() > 0) {
                 float y = yFor(latest, top, bottom, low, span);
@@ -1616,17 +1714,17 @@ public final class MainActivity extends Activity {
             paint.setColor(MUTED);
             paint.setTextSize(dp(9));
             paint.setTextAlign(Paint.Align.LEFT);
-            String label = candles.size() >= 2 ? "РЕАЛЬНЫЕ СВЕЧИ · BINANCE" : "ИСТОРИЯ КОТИРОВОК";
+            String label = visibleCandleData.size() >= 2 ? "РЕАЛЬНЫЕ СВЕЧИ · BINANCE · МАСШТАБ ЖЕСТОМ" : "ИСТОРИЯ КОТИРОВОК · МАСШТАБ ЖЕСТОМ";
             canvas.drawText(label, left + dp(3), h - dp(5), paint);
         }
 
         private void drawCandles(Canvas canvas, float left, float right, float top, float bottom,
-                                 BigDecimal min, BigDecimal span) {
+                                 BigDecimal min, BigDecimal span, List<Candle> data) {
             float plotWidth = right - left;
-            float step = plotWidth / candles.size();
+            float step = plotWidth / data.size();
             float candleWidth = Math.max(dp(2), Math.min(dp(9), step * 0.55f));
-            for (int i = 0; i < candles.size(); i++) {
-                Candle c = candles.get(i);
+            for (int i = 0; i < data.size(); i++) {
+                Candle c = data.get(i);
                 float x = left + (i + 0.5f) * step;
                 float yHigh = yFor(c.high, top, bottom, min, span);
                 float yLow = yFor(c.low, top, bottom, min, span);
@@ -1646,8 +1744,8 @@ public final class MainActivity extends Activity {
         }
 
         private void drawLine(Canvas canvas, float left, float right, float top, float bottom,
-                              BigDecimal min, BigDecimal span) {
-            ArrayList<BigDecimal> series = new ArrayList<>(points);
+                              BigDecimal min, BigDecimal span, List<BigDecimal> visiblePointData) {
+            ArrayList<BigDecimal> series = new ArrayList<>(visiblePointData);
             if (latest.signum() > 0 && (series.isEmpty() ||
                     series.get(series.size() - 1).compareTo(latest) != 0)) series.add(latest);
             if (series.size() == 1) series.add(series.get(0));
