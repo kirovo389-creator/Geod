@@ -1415,7 +1415,7 @@ public final class MainActivity extends Activity {
     private static int releaseCode(String tag) {
         String prefix = "frilance-v1.0.";
         if (!tag.startsWith(prefix)) return 0;
-        try { return Integer.parseInt(tag.substring(prefix.length())); }
+        try { return 1000 + Integer.parseInt(tag.substring(prefix.length())); }
         catch (NumberFormatException e) { return 0; }
     }
 
