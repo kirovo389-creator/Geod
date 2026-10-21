@@ -34,6 +34,34 @@ public class TradeMathTest {
     }
 
     @Test
+    public void sellingOriginalFiveDollarPositionClosesAllAndRealizesGainOrLoss() {
+        BigDecimal boughtQuantity = TradeMath.quantityForCash(
+                new BigDecimal("5"), new BigDecimal("100"));
+
+        BigDecimal qtyAtProfit = TradeMath.quantityForSale(
+                new BigDecimal("5"), new BigDecimal("120"),
+                boughtQuantity, new BigDecimal("5"));
+        assertEquals(0, boughtQuantity.compareTo(qtyAtProfit));
+        assertEquals(0, new BigDecimal("6").compareTo(
+                TradeMath.cashAfterSale(BigDecimal.ZERO, qtyAtProfit, new BigDecimal("120"))));
+
+        BigDecimal qtyAtLoss = TradeMath.quantityForSale(
+                new BigDecimal("5"), new BigDecimal("80"),
+                boughtQuantity, new BigDecimal("5"));
+        assertEquals(0, boughtQuantity.compareTo(qtyAtLoss));
+        assertEquals(0, new BigDecimal("4").compareTo(
+                TradeMath.cashAfterSale(BigDecimal.ZERO, qtyAtLoss, new BigDecimal("80"))));
+    }
+
+    @Test
+    public void sellBelowCostAndCurrentValueKeepsOnlyRequestedPartOpen() {
+        BigDecimal quantity = new BigDecimal("0.05");
+        BigDecimal toSell = TradeMath.quantityForSale(new BigDecimal("2"),
+                new BigDecimal("100"), quantity, new BigDecimal("5"));
+        assertEquals(0, new BigDecimal("0.02").compareTo(toSell));
+    }
+
+    @Test
     public void soldCostBasisIsProportional() {
         BigDecimal basis = TradeMath.soldCostBasis(new BigDecimal("10"),
                 new BigDecimal("0.25"), new BigDecimal("0.5"));
