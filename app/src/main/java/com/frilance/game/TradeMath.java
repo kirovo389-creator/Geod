@@ -25,6 +25,28 @@ public final class TradeMath {
         return quantity.multiply(unitPrice, MC);
     }
 
+    /**
+     * Converts a USD sell request into a quantity. Entering the original cost or
+     * the current position value closes the full position, so gains and losses
+     * are realized instead of leaving a tiny remainder open by accident.
+     */
+    public static BigDecimal quantityForSale(BigDecimal requestedUsd,
+                                             BigDecimal unitPrice,
+                                             BigDecimal heldQuantity,
+                                             BigDecimal costBasis) {
+        requireNonNegative(requestedUsd, "requestedUsd");
+        requirePositive(unitPrice, "unitPrice");
+        requireNonNegative(heldQuantity, "heldQuantity");
+        requireNonNegative(costBasis, "costBasis");
+
+        BigDecimal positionValue = marketValue(heldQuantity, unitPrice);
+        if (requestedUsd.compareTo(costBasis) >= 0 ||
+                requestedUsd.compareTo(positionValue) >= 0) {
+            return heldQuantity;
+        }
+        return quantityForCash(requestedUsd, unitPrice).min(heldQuantity);
+    }
+
     public static BigDecimal cashAfterSale(BigDecimal cash, BigDecimal quantity, BigDecimal unitPrice) {
         requireNonNegative(cash, "cash");
         return cash.add(marketValue(quantity, unitPrice), MC);
