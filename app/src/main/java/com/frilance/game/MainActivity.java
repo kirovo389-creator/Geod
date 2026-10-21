@@ -90,7 +90,7 @@ public final class MainActivity extends Activity {
     private static final int RED = Color.rgb(222, 85, 100);
     private static final String ALERT_CHANNEL = "market_alerts";
 
-    private final List<Asset> assets = Arrays.asList(
+    private final List<Asset> assets = new ArrayList<>(Arrays.asList(
             new Asset("BTC", "Bitcoin", "BTC", "BTCUSDT", "binance", "", "₿"),
             new Asset("ETH", "Ethereum", "ETH", "ETHUSDT", "binance", "", "E"),
             new Asset("SOL", "Solana", "SOL", "SOLUSDT", "binance", "", "S"),
@@ -175,7 +175,7 @@ public final class MainActivity extends Activity {
             new Asset("BAT", "Basic Attention Token", "BAT", "BATUSDT", "binance", "", "B"),
             new Asset("RVN", "Ravencoin", "RVN", "RVNUSDT", "binance", "", "R"),
             new Asset("ANKR", "Ankr", "ANKR", "ANKRUSDT", "binance", "", "A")
-    );
+    ));
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService marketExecutor = Executors.newFixedThreadPool(4);
@@ -973,49 +973,67 @@ public final class MainActivity extends Activity {
         if (allQuotesPending) return;
         allQuotesPending = true;
         marketExecutor.execute(() -> {
-            Map<String, Quote> fetchedByAsset = new LinkedHashMap<>();
+            Map<String, Quote> fetchedByPair = new LinkedHashMap<>();
             try {
+                // This public spot endpoint returns the active symbol ticker set in one request.
                 JSONArray rows = new JSONArray(httpGet(
                         "https://api.binance.com/api/v3/ticker/24hr", 12000));
-                Map<String, Asset> byPair = new HashMap<>();
-                for (Asset asset : assets) {
-                    if ("binance".equals(asset.source)) byPair.put(asset.pair, asset);
-                }
                 long now = System.currentTimeMillis();
                 for (int i = 0; i < rows.length(); i++) {
                     JSONObject row = rows.optJSONObject(i);
                     if (row == null) continue;
-                    Asset asset = byPair.get(row.optString("symbol", ""));
-                    if (asset == null) continue;
+                    String pair = row.optString("symbol", "");
+                    if (!pair.endsWith("USDT") || pair.length() <= 4) continue;
+                    String base = pair.substring(0, pair.length() - 4);
+                    if (!base.matches("[A-Z0-9]{2,15}") || isLeveragedToken(base)) continue;
                     BigDecimal price = decimal(row.optString("lastPrice", "0"), BigDecimal.ZERO);
                     BigDecimal change = decimal(row.optString("priceChangePercent", "0"), BigDecimal.ZERO);
                     if (price.signum() > 0) {
-                        fetchedByAsset.put(asset.id, new Quote(price, change, "Binance", now));
+                        fetchedByPair.put(pair, new Quote(price, change, "Binance", now));
                     }
                 }
             } catch (Exception ignored) { }
-            Map<String, Quote> results = fetchedByAsset;
+            Map<String, Quote> results = fetchedByPair;
             handler.post(() -> {
                 allQuotesPending = false;
                 if (results.isEmpty()) return;
+                Map<String, Asset> byPair = new HashMap<>();
+                for (Asset asset : assets) byPair.put(asset.pair, asset);
                 for (Map.Entry<String, Quote> entry : results.entrySet()) {
-                    quotes.put(entry.getKey(), entry.getValue());
-                    List<BigDecimal> series = recentPrices.get(entry.getKey());
+                    Asset asset = byPair.get(entry.getKey());
+                    if (asset == null) {
+                        String base = entry.getKey().substring(0, entry.getKey().length() - 4);
+                        asset = new Asset(base, base, base, entry.getKey(), "binance", "", base.substring(0, 1));
+                        assets.add(asset);
+                        byPair.put(asset.pair, asset);
+                        recentPrices.put(base, new ArrayList<>());
+                    }
+                    quotes.put(asset.id, entry.getValue());
+                    List<BigDecimal> series = recentPrices.get(asset.id);
                     if (series != null) {
                         series.add(entry.getValue().price);
                         while (series.size() > 120) series.remove(0);
                     }
-                    maybeAlertForDrop(assetById(entry.getKey()), entry.getValue());
+                    maybeAlertForDrop(asset, entry.getValue());
                 }
                 savePriceCache();
                 updateHeader();
                 updateMarketRows();
-                if (currentTab.equals("chart") && results.containsKey(selectedAssetId)) {
+                if (currentTab.equals("chart") && quotes.containsKey(selectedAssetId)) {
                     updateSelectedStats();
                     updateChart();
                 }
             });
         });
+    }
+
+    private boolean isLeveragedToken(String base) {
+        return base.endsWith("UP") || base.endsWith("DOWN") ||
+                base.endsWith("BULL") || base.endsWith("BEAR") ||
+                base.endsWith("2L") || base.endsWith("2S") ||
+                base.endsWith("3L") || base.endsWith("3S") ||
+                base.endsWith("4L") || base.endsWith("4S") ||
+                base.endsWith("5L") || base.endsWith("5S");
     }
 
     private Quote fetchQuote(Asset asset) throws Exception {
