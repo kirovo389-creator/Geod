@@ -86,21 +86,95 @@ public final class MainActivity extends Activity {
     private static final int LINE = Color.rgb(37, 49, 60);
     private static final int MUTED = Color.rgb(133, 151, 165);
     private static final int WHITE = Color.rgb(236, 244, 248);
-    private static final int MINT = Color.rgb(55, 230, 172);
-    private static final int RED = Color.rgb(255, 101, 116);
+    private static final int MINT = Color.rgb(76, 190, 145);
+    private static final int RED = Color.rgb(222, 85, 100);
     private static final String ALERT_CHANNEL = "market_alerts";
 
     private final List<Asset> assets = Arrays.asList(
             new Asset("BTC", "Bitcoin", "BTC", "BTCUSDT", "binance", "", "₿"),
-            new Asset("ETH", "Ethereum", "ETH", "ETHUSDT", "binance", "", "◆"),
+            new Asset("ETH", "Ethereum", "ETH", "ETHUSDT", "binance", "", "E"),
             new Asset("SOL", "Solana", "SOL", "SOLUSDT", "binance", "", "S"),
             new Asset("BNB", "BNB", "BNB", "BNBUSDT", "binance", "", "B"),
             new Asset("XRP", "XRP", "XRP", "XRPUSDT", "binance", "", "X"),
-            new Asset("DOGE", "Dogecoin", "DOGE", "DOGEUSDT", "binance", "", "Ð"),
+            new Asset("DOGE", "Dogecoin", "DOGE", "DOGEUSDT", "binance", "", "D"),
             new Asset("ADA", "Cardano", "ADA", "ADAUSDT", "binance", "", "A"),
             new Asset("LINK", "Chainlink", "LINK", "LINKUSDT", "binance", "", "L"),
             new Asset("TRX", "TRON", "TRX", "TRXUSDT", "binance", "", "T"),
-            new Asset("AVAX", "Avalanche", "AVAX", "AVAXUSDT", "binance", "", "A")
+            new Asset("AVAX", "Avalanche", "AVAX", "AVAXUSDT", "binance", "", "A"),
+            new Asset("DOT", "Polkadot", "DOT", "DOTUSDT", "binance", "", "P"),
+            new Asset("LTC", "Litecoin", "LTC", "LTCUSDT", "binance", "", "Ł"),
+            new Asset("BCH", "Bitcoin Cash", "BCH", "BCHUSDT", "binance", "", "B"),
+            new Asset("NEAR", "NEAR Protocol", "NEAR", "NEARUSDT", "binance", "", "N"),
+            new Asset("UNI", "Uniswap", "UNI", "UNIUSDT", "binance", "", "U"),
+            new Asset("AAVE", "Aave", "AAVE", "AAVEUSDT", "binance", "", "A"),
+            new Asset("ETC", "Ethereum Classic", "ETC", "ETCUSDT", "binance", "", "E"),
+            new Asset("XLM", "Stellar", "XLM", "XLMUSDT", "binance", "", "X"),
+            new Asset("ATOM", "Cosmos", "ATOM", "ATOMUSDT", "binance", "", "C"),
+            new Asset("ICP", "Internet Computer", "ICP", "ICPUSDT", "binance", "", "I"),
+            new Asset("FIL", "Filecoin", "FIL", "FILUSDT", "binance", "", "F"),
+            new Asset("OP", "Optimism", "OP", "OPUSDT", "binance", "", "O"),
+            new Asset("ARB", "Arbitrum", "ARB", "ARBUSDT", "binance", "", "A"),
+            new Asset("SUI", "Sui", "SUI", "SUIUSDT", "binance", "", "S"),
+            new Asset("APT", "Aptos", "APT", "APTUSDT", "binance", "", "A"),
+            new Asset("TIA", "Celestia", "TIA", "TIAUSDT", "binance", "", "T"),
+            new Asset("INJ", "Injective", "INJ", "INJUSDT", "binance", "", "I"),
+            new Asset("SEI", "Sei", "SEI", "SEIUSDT", "binance", "", "S"),
+            new Asset("TON", "Toncoin", "TON", "TONUSDT", "binance", "", "T"),
+            new Asset("SHIB", "Shiba Inu", "SHIB", "SHIBUSDT", "binance", "", "S"),
+            new Asset("PEPE", "Pepe", "PEPE", "PEPEUSDT", "binance", "", "P"),
+            new Asset("FLOKI", "FLOKI", "FLOKI", "FLOKIUSDT", "binance", "", "F"),
+            new Asset("BONK", "Bonk", "BONK", "BONKUSDT", "binance", "", "B"),
+            new Asset("WIF", "dogwifhat", "WIF", "WIFUSDT", "binance", "", "W"),
+            new Asset("RENDER", "Render", "RENDER", "RENDERUSDT", "binance", "", "R"),
+            new Asset("FET", "Artificial Superintelligence", "FET", "FETUSDT", "binance", "", "F"),
+            new Asset("STX", "Stacks", "STX", "STXUSDT", "binance", "", "S"),
+            new Asset("IMX", "Immutable", "IMX", "IMXUSDT", "binance", "", "I"),
+            new Asset("GRT", "The Graph", "GRT", "GRTUSDT", "binance", "", "G"),
+            new Asset("LDO", "Lido DAO", "LDO", "LDOUSDT", "binance", "", "L"),
+            new Asset("ENS", "Ethereum Name Service", "ENS", "ENSUSDT", "binance", "", "E"),
+            new Asset("SAND", "The Sandbox", "SAND", "SANDUSDT", "binance", "", "S"),
+            new Asset("MANA", "Decentraland", "MANA", "MANAUSDT", "binance", "", "M"),
+            new Asset("AXS", "Axie Infinity", "AXS", "AXSUSDT", "binance", "", "A"),
+            new Asset("CHZ", "Chiliz", "CHZ", "CHZUSDT", "binance", "", "C"),
+            new Asset("CRV", "Curve DAO", "CRV", "CRVUSDT", "binance", "", "C"),
+            new Asset("COMP", "Compound", "COMP", "COMPUSDT", "binance", "", "C"),
+            new Asset("DYDX", "dYdX", "DYDX", "DYDXUSDT", "binance", "", "D"),
+            new Asset("SNX", "Synthetix", "SNX", "SNXUSDT", "binance", "", "S"),
+            new Asset("ALGO", "Algorand", "ALGO", "ALGOUSDT", "binance", "", "A"),
+            new Asset("VET", "VeChain", "VET", "VETUSDT", "binance", "", "V"),
+            new Asset("HBAR", "Hedera", "HBAR", "HBARUSDT", "binance", "", "H"),
+            new Asset("THETA", "Theta Network", "THETA", "THETAUSDT", "binance", "", "T"),
+            new Asset("KAVA", "Kava", "KAVA", "KAVAUSDT", "binance", "", "K"),
+            new Asset("EGLD", "MultiversX", "EGLD", "EGLDUSDT", "binance", "", "E"),
+            new Asset("ZEC", "Zcash", "ZEC", "ZECUSDT", "binance", "", "Z"),
+            new Asset("DASH", "Dash", "DASH", "DASHUSDT", "binance", "", "D"),
+            new Asset("XTZ", "Tezos", "XTZ", "XTZUSDT", "binance", "", "T"),
+            new Asset("IOTA", "IOTA", "IOTA", "IOTAUSDT", "binance", "", "I"),
+            new Asset("RUNE", "THORChain", "RUNE", "RUNEUSDT", "binance", "", "R"),
+            new Asset("MINA", "Mina", "MINA", "MINAUSDT", "binance", "", "M"),
+            new Asset("ROSE", "Oasis Network", "ROSE", "ROSEUSDT", "binance", "", "R"),
+            new Asset("CELO", "Celo", "CELO", "CELOUSDT", "binance", "", "C"),
+            new Asset("LPT", "Livepeer", "LPT", "LPTUSDT", "binance", "", "L"),
+            new Asset("ENA", "Ethena", "ENA", "ENAUSDT", "binance", "", "E"),
+            new Asset("WLD", "Worldcoin", "WLD", "WLDUSDT", "binance", "", "W"),
+            new Asset("NOT", "Notcoin", "NOT", "NOTUSDT", "binance", "", "N"),
+            new Asset("STRK", "Starknet", "STRK", "STRKUSDT", "binance", "", "S"),
+            new Asset("ZK", "zkSync", "ZK", "ZKUSDT", "binance", "", "Z"),
+            new Asset("BLUR", "Blur", "BLUR", "BLURUSDT", "binance", "", "B"),
+            new Asset("ORDI", "ORDI", "ORDI", "ORDIUSDT", "binance", "", "O"),
+            new Asset("GALA", "Gala", "GALA", "GALAUSDT", "binance", "", "G"),
+            new Asset("PENDLE", "Pendle", "PENDLE", "PENDLEUSDT", "binance", "", "P"),
+            new Asset("JUP", "Jupiter", "JUP", "JUPUSDT", "binance", "", "J"),
+            new Asset("PYTH", "Pyth Network", "PYTH", "PYTHUSDT", "binance", "", "P"),
+            new Asset("POL", "POL", "POL", "POLUSDT", "binance", "", "P"),
+            new Asset("TWT", "Trust Wallet Token", "TWT", "TWTUSDT", "binance", "", "T"),
+            new Asset("CAKE", "PancakeSwap", "CAKE", "CAKEUSDT", "binance", "", "C"),
+            new Asset("1INCH", "1inch", "1INCH", "1INCHUSDT", "binance", "", "1"),
+            new Asset("ARKM", "Arkham", "ARKM", "ARKMUSDT", "binance", "", "A"),
+            new Asset("QTUM", "Qtum", "QTUM", "QTUMUSDT", "binance", "", "Q"),
+            new Asset("BAT", "Basic Attention Token", "BAT", "BATUSDT", "binance", "", "B"),
+            new Asset("RVN", "Ravencoin", "RVN", "RVNUSDT", "binance", "", "R"),
+            new Asset("ANKR", "Ankr", "ANKR", "ANKRUSDT", "binance", "", "A")
     );
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -108,6 +182,7 @@ public final class MainActivity extends Activity {
     private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
     private final Set<String> pendingQuotes = ConcurrentHashMap.newKeySet();
     private final Set<String> pendingCandles = ConcurrentHashMap.newKeySet();
+    private boolean allQuotesPending;
     private final Map<String, Quote> quotes = new LinkedHashMap<>();
     private final Map<String, BigDecimal> holdings = new HashMap<>();
     private final Map<String, BigDecimal> costBasis = new HashMap<>();
@@ -157,7 +232,7 @@ public final class MainActivity extends Activity {
             long now = System.currentTimeMillis();
             if (now - lastAllMarketRefresh >= ALL_MARKETS_REFRESH_MS) {
                 lastAllMarketRefresh = now;
-                for (Asset asset : assets) requestQuote(asset);
+                requestAllQuotes();
             }
             if (currentTab.equals("chart") && now - lastCandleRefresh >= 60_000L) {
                 requestCandles();
@@ -178,7 +253,7 @@ public final class MainActivity extends Activity {
         createNotificationChannel();
         requestNotificationPermission();
         renderRoot();
-        for (Asset asset : assets) requestQuote(asset);
+        requestAllQuotes();
         lastAllMarketRefresh = System.currentTimeMillis();
         handler.postDelayed(() -> requestCandles(), 700);
         handler.postDelayed(marketTicker, MARKET_REFRESH_MS);
@@ -329,9 +404,9 @@ public final class MainActivity extends Activity {
         LinearLayout wallet = new LinearLayout(this);
         wallet.setOrientation(LinearLayout.VERTICAL);
         wallet.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
-        headerEquity = text("$5.00", 18, MINT, true);
+        headerEquity = text("ДОСТУПНО $5.00", 14, MINT, true);
         headerEquity.setGravity(Gravity.RIGHT);
-        headerCash = text("ПОРТФЕЛЬ $5.00", 9, MUTED, true);
+        headerCash = text("КАПИТАЛ $5.00", 9, MUTED, true);
         headerCash.setGravity(Gravity.RIGHT);
         wallet.addView(headerEquity);
         wallet.addView(headerCash);
@@ -781,11 +856,7 @@ public final class MainActivity extends Activity {
             toast("У тебя нет " + asset.symbol + " для продажи.");
             return;
         }
-        BigDecimal qty = entered.divide(quote.price, 36, RoundingMode.DOWN);
-        if (qty.compareTo(held) > 0) {
-            toast("Сумма превышает стоимость открытой позиции.");
-            return;
-        }
+        BigDecimal qty = TradeMath.quantityForSale(entered, quote.price, held, basis(asset.id));
         if (qty.signum() <= 0) {
             toast("Сумма слишком мала для расчёта.");
             return;
@@ -814,8 +885,8 @@ public final class MainActivity extends Activity {
     }
 
     private void updateHeader() {
-        if (headerEquity != null) headerEquity.setText(money(cash));
-        if (headerCash != null) headerCash.setText("ПОРТФЕЛЬ " + money(totalEquity()));
+        if (headerEquity != null) headerEquity.setText("ДОСТУПНО " + money(cash));
+        if (headerCash != null) headerCash.setText("КАПИТАЛ " + money(totalEquity()));
         if (headerLive != null) headerLive.setText("LIVE");
     }
 
@@ -896,6 +967,55 @@ public final class MainActivity extends Activity {
 
     private void selectedChangeTextIfPresent(String message) {
         if (selectedChangeText != null) selectedChangeText.setText(message);
+    }
+
+    private void requestAllQuotes() {
+        if (allQuotesPending) return;
+        allQuotesPending = true;
+        marketExecutor.execute(() -> {
+            Map<String, Quote> fetchedByAsset = new LinkedHashMap<>();
+            try {
+                JSONArray rows = new JSONArray(httpGet(
+                        "https://api.binance.com/api/v3/ticker/24hr", 12000));
+                Map<String, Asset> byPair = new HashMap<>();
+                for (Asset asset : assets) {
+                    if ("binance".equals(asset.source)) byPair.put(asset.pair, asset);
+                }
+                long now = System.currentTimeMillis();
+                for (int i = 0; i < rows.length(); i++) {
+                    JSONObject row = rows.optJSONObject(i);
+                    if (row == null) continue;
+                    Asset asset = byPair.get(row.optString("symbol", ""));
+                    if (asset == null) continue;
+                    BigDecimal price = decimal(row.optString("lastPrice", "0"), BigDecimal.ZERO);
+                    BigDecimal change = decimal(row.optString("priceChangePercent", "0"), BigDecimal.ZERO);
+                    if (price.signum() > 0) {
+                        fetchedByAsset.put(asset.id, new Quote(price, change, "Binance", now));
+                    }
+                }
+            } catch (Exception ignored) { }
+            Map<String, Quote> results = fetchedByAsset;
+            handler.post(() -> {
+                allQuotesPending = false;
+                if (results.isEmpty()) return;
+                for (Map.Entry<String, Quote> entry : results.entrySet()) {
+                    quotes.put(entry.getKey(), entry.getValue());
+                    List<BigDecimal> series = recentPrices.get(entry.getKey());
+                    if (series != null) {
+                        series.add(entry.getValue().price);
+                        while (series.size() > 120) series.remove(0);
+                    }
+                    maybeAlertForDrop(assetById(entry.getKey()), entry.getValue());
+                }
+                savePriceCache();
+                updateHeader();
+                updateMarketRows();
+                if (currentTab.equals("chart") && results.containsKey(selectedAssetId)) {
+                    updateSelectedStats();
+                    updateChart();
+                }
+            });
+        });
     }
 
     private Quote fetchQuote(Asset asset) throws Exception {
@@ -1186,7 +1306,7 @@ public final class MainActivity extends Activity {
     private GradientDrawable background(int fill, int radiusDp, int stroke) {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(fill);
-        drawable.setCornerRadius(dp(radiusDp));
+        drawable.setCornerRadius(dp(Math.min(radiusDp, 5)));
         if (stroke != Color.TRANSPARENT) drawable.setStroke(dp(1), stroke);
         return drawable;
     }
