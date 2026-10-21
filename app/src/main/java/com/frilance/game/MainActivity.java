@@ -974,8 +974,9 @@ public final class MainActivity extends Activity {
         allQuotesPending = true;
         marketExecutor.execute(() -> {
             Map<String, Quote> fetchedByPair = new LinkedHashMap<>();
+            Map<String, BigDecimal> volumeByPair = new HashMap<>();
             try {
-                // This public spot endpoint returns the active symbol ticker set in one request.
+                // One public spot endpoint supplies live prices for all active symbols.
                 JSONArray rows = new JSONArray(httpGet(
                         "https://api.binance.com/api/v3/ticker/24hr", 12000));
                 long now = System.currentTimeMillis();
@@ -988,20 +989,31 @@ public final class MainActivity extends Activity {
                     if (!base.matches("[A-Z0-9]{2,15}") || isLeveragedToken(base)) continue;
                     BigDecimal price = decimal(row.optString("lastPrice", "0"), BigDecimal.ZERO);
                     BigDecimal change = decimal(row.optString("priceChangePercent", "0"), BigDecimal.ZERO);
+                    BigDecimal volume = decimal(row.optString("quoteVolume", "0"), BigDecimal.ZERO);
                     if (price.signum() > 0) {
                         fetchedByPair.put(pair, new Quote(price, change, "Binance", now));
+                        volumeByPair.put(pair, volume);
                     }
                 }
             } catch (Exception ignored) { }
             Map<String, Quote> results = fetchedByPair;
+            Map<String, BigDecimal> volumes = volumeByPair;
             handler.post(() -> {
                 allQuotesPending = false;
                 if (results.isEmpty()) return;
                 Map<String, Asset> byPair = new HashMap<>();
                 for (Asset asset : assets) byPair.put(asset.pair, asset);
-                for (Map.Entry<String, Quote> entry : results.entrySet()) {
+
+                List<Map.Entry<String, Quote>> orderedResults = new ArrayList<>(results.entrySet());
+                orderedResults.sort((left, right) ->
+                        volumes.getOrDefault(right.getKey(), BigDecimal.ZERO).compareTo(
+                                volumes.getOrDefault(left.getKey(), BigDecimal.ZERO)));
+
+                // Keep the selector fast on phones while including the 250 most liquid markets.
+                for (Map.Entry<String, Quote> entry : orderedResults) {
                     Asset asset = byPair.get(entry.getKey());
                     if (asset == null) {
+                        if (assets.size() >= 250) continue;
                         String base = entry.getKey().substring(0, entry.getKey().length() - 4);
                         asset = new Asset(base, base, base, entry.getKey(), "binance", "", base.substring(0, 1));
                         assets.add(asset);
