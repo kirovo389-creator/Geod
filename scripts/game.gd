@@ -35,6 +35,12 @@ func block(parent: Node3D, p: Vector3, s: Vector3, c: Color) -> MeshInstance3D:
 	return n
 
 func _ready() -> void:
+	# Render the menu before constructing the 3D world, avoiding a blank launch frame.
+	make_ui()
+	await RenderingServer.frame_post_draw
+	_build_world()
+
+func _build_world() -> void:
 	var we := WorldEnvironment.new()
 	var env := Environment.new()
 	env.background_mode = Environment.BG_SKY
@@ -112,7 +118,6 @@ func _ready() -> void:
 	camera.position.y = 0.58
 	player.add_child(camera)
 	camera.current = true
-	make_ui()
 
 func make_ui() -> void:
 	var layer := CanvasLayer.new()
