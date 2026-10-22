@@ -60,6 +60,12 @@ jobs:
           export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
           export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
           godot --headless --path . --editor --import --quit
+          set -o pipefail
+          godot --headless --path . --quit-after 10 --verbose 2>&1 | tee /tmp/godot-smoke.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:' /tmp/godot-smoke.log; then
+            echo "Main scene smoke test failed."
+            exit 1
+          fi
           godot --headless --verbose --path . --export-debug "Android" "$PWD/build/Aether.apk"
           test -s build/Aether.apk
           unzip -t build/Aether.apk
