@@ -53,7 +53,7 @@ jobs:
       - name: Configure Godot Android paths and debug keystore
         run: |
           mkdir -p "$HOME/.config/godot" "$HOME/.android" build
-          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          cat > "$HOME/.config/godot/editor_settings-4.5.tres" <<EOF
           [gd_resource type="EditorSettings" format=3]
 
           [resource]
