@@ -1,7 +1,4 @@
 plugins {
     id 'com.android.application' version '8.7.3' apply false
-    id 'java' apply false
 }
-ext {
-    gdxVersion = '1.13.1'
-}
+ext { gdxVersion = '1.13.1' }
