@@ -8,23 +8,43 @@ on:
 permissions:
   contents: write
 
+env:
+  GODOT_VERSION: 4.4.1
+  PROJECT_PATH: .
+  EXPORT_NAME: Aether
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    container:
+      image: barichello/godot-ci:4.4.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Export Android APK
-        uses: barichello/godot-ci@4.4.1
         with:
-          name: Aether
-          preset: Android
-          project: .
-          output: build/Aether.apk
+          lfs: true
 
-      - name: Verify APK
-        run: test -s build/Aether.apk
+      - name: Prepare Godot export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Export APK
+        run: |
+          mkdir -p build
+          godot --headless --path "$PROJECT_PATH" --editor --quit
+          godot --headless --path "$PROJECT_PATH" --install-android-build-template
+          godot --headless --path "$PROJECT_PATH" --export-debug "Android" "$PWD/build/Aether.apk"
+          test -s build/Aether.apk
 
       - name: Publish GitHub Release
         env:
