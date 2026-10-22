@@ -79,7 +79,7 @@ require(environment_path.is_file(), "Editable map scene is missing.")
 interactable_scene = interactables_path.read_text(encoding="utf-8")
 for object_id in ("door_front", "trash_living", "stain_living", "loot_watch", "loot_tablet", "loot_camera", "loot_vase", "loot_wallet", "loot_tv", "loot_speaker", "car_trunk"):
     require(f'metadata/target_id = "{object_id}"' in interactable_scene, f"Editable interactable missing: {object_id}")
-require("RigidBody3D" in interactable_scene and "Mesh_VaseBody" in interactable_scene and "Mesh_CameraLens" in interactable_scene, "Physics props need item-specific meshes.")
+require("RigidBody3D" in interactable_scene and "M_VaseBody" in interactable_scene and "Mesh_CameraLens" in interactable_scene, "Physics props need item-specific meshes.")
 environment_scene = environment_path.read_text(encoding="utf-8")
 for required in ('name="CleanerVan"', 'name="ClientSedan"', 'name="ClientMikhail"', 'name="AnimatedTrunkLid"'):
     require(required in environment_scene, f"Scene-authored map detail missing: {required}")
