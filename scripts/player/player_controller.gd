@@ -94,8 +94,8 @@ func _add_forearm(part_name: String, pos: Vector3, roll: float, tint: Color) -> 
 	var capsule := CapsuleMesh.new()
 	capsule.radius = 0.105
 	capsule.height = 0.66
-	capsule.radial_segments = 8
-	capsule.rings = 4
+	capsule.radial_segments = 12
+	capsule.rings = 6
 	forearm.mesh = capsule
 	forearm.position = pos
 	forearm.rotation.z = roll
@@ -109,9 +109,22 @@ func _add_forearm(part_name: String, pos: Vector3, roll: float, tint: Color) -> 
 func _add_hand_piece(part_name: String, pos: Vector3, dimensions: Vector3, tint: Color) -> void:
 	var piece := MeshInstance3D.new()
 	piece.name = part_name
-	var shape := BoxMesh.new()
-	shape.size = dimensions
-	piece.mesh = shape
+	if part_name.contains("Cuff"):
+		var cuff := CylinderMesh.new()
+		cuff.top_radius = 0.5
+		cuff.bottom_radius = 0.5
+		cuff.height = 1.0
+		cuff.radial_segments = 16
+		cuff.rings = 2
+		piece.mesh = cuff
+	else:
+		var glove := SphereMesh.new()
+		glove.radius = 0.5
+		glove.height = 1.0
+		glove.radial_segments = 16
+		glove.rings = 8
+		piece.mesh = glove
+	piece.scale = dimensions
 	piece.position = pos
 	var material := StandardMaterial3D.new()
 	material.albedo_color = tint
