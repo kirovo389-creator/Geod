@@ -5,6 +5,8 @@ const SAMPLE_RATE := 22050
 var players: Dictionary = {}
 var definitions: Dictionary = {
 	"ui": Vector2(760.0, 0.045),
+	"footstep": Vector2(105.0, 0.055),
+	"footstep_heavy": Vector2(72.0, 0.085),
 	"door": Vector2(330.0, 0.12),
 	"pause": Vector2(390.0, 0.055),
 	"clean": Vector2(435.0, 0.11),
@@ -22,7 +24,7 @@ func _ready() -> void:
 		var entry: Vector2 = definitions[key]
 		var sound := AudioStreamPlayer.new()
 		sound.name = "Tone_" + str(key)
-		sound.volume_db = -8.0
+		sound.volume_db = -15.0 if key in ["footstep", "footstep_heavy"] else -8.0
 		sound.stream = _make_tone(entry.x, entry.y)
 		add_child(sound)
 		players[key] = sound

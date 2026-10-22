@@ -34,6 +34,7 @@ var cleaning_tool: MeshInstance3D
 var hands_tween: Tween
 var walk_phase := 0.0
 var position_sync_timer := 0.0
+var footstep_timer := 0.0
 
 
 func _ready() -> void:
@@ -244,6 +245,13 @@ func _physics_process(delta: float) -> void:
 	camera.rotation.x = pitch
 	move_and_slide()
 	_animate_view_hands(delta, direction.length())
+	if is_on_floor() and Vector2(velocity.x, velocity.z).length() > 0.8:
+		footstep_timer -= delta
+		if footstep_timer <= 0.0:
+			AudioManager.play_event("footstep_heavy" if has_large_item else "footstep")
+			footstep_timer = 0.52 if wants_sprint else (0.78 if has_large_item else 0.64)
+	else:
+		footstep_timer = minf(footstep_timer, 0.12)
 
 	if global_position.y < -5.0:
 		global_position = Vector3(0, 0.15, 4.5)

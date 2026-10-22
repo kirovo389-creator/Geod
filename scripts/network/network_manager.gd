@@ -168,9 +168,13 @@ func submit_transform(claimed_peer_id: int, position: Vector3, yaw: float) -> vo
 		return
 	if not is_finite(position.x) or not is_finite(position.y) or not is_finite(position.z) or position.length() > 150.0:
 		return
-	var previous: Vector3 = last_positions.get(sender, Vector3(0, 0.18, 9.75))
-	if previous.distance_to(position) > MAX_POSITION_STEP:
-		return
+	# Accept the first valid transform from each peer. A joining phone starts
+	# at a different spawn point than the host, so comparing it to the host's
+	# spawn falsely rejects every update. Limit movement only after seeding.
+	if last_positions.has(sender):
+		var previous: Vector3 = last_positions[sender]
+		if previous.distance_to(position) > MAX_POSITION_STEP:
+			return
 	last_positions[sender] = position
 	var world := get_tree().get_first_node_in_group("mission_world")
 	if world != null:

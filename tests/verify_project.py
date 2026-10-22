@@ -51,9 +51,11 @@ ui = (ROOT / "scripts/ui/game_ui.gd").read_text(encoding="utf-8")
 require("ЭНЕРГИЯ РЫВКА" in ui and "func set_stamina" in ui, "Stamina HUD is not wired.")
 audio = (ROOT / "scripts/core/audio_manager.gd").read_text(encoding="utf-8")
 require("func play_event" in audio and "AudioStreamWAV" in audio, "Generated interaction audio is missing.")
+require('"footstep"' in audio and '"footstep_heavy"' in audio, "Movement footstep audio events are missing.")
+require("footstep_timer" in player and "AudioManager.play_event" in player, "Footsteps are not connected to player movement.")
 
 network = (ROOT / "scripts/network/network_manager.gd").read_text(encoding="utf-8")
-for required in ("ENetMultiplayerPeer", "create_server", "create_client", "server_request_action", "submit_transform", "receive_snapshot"):
+for required in ("ENetMultiplayerPeer", "create_server", "create_client", "server_request_action", "submit_transform", "receive_snapshot", "if last_positions.has(sender)"):
     require(required in network, f"Network feature is missing: {required}")
 
 preset = (ROOT / "export_presets.cfg").read_text(encoding="utf-8")
