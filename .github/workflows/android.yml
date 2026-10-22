@@ -1,4 +1,4 @@
-name: Build AETHER Android (Unity)
+name: Build AETHER Android (libGDX)
 on:
   push:
     branches: [main]
@@ -10,35 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check Unity license
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        run: |
-          if [ -z "$UNITY_LICENSE" ]; then
-            echo "::error::Add UNITY_LICENSE to repository Actions secrets to build Unity."
-            exit 1
-          fi
-      - name: Build Android APK
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      - uses: actions/setup-java@v4
         with:
-          projectPath: .
-          unityVersion: 6000.0.40f1
-          targetPlatform: Android
-          androidAppBundle: false
-      - name: Verify APK and print size
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build debug APK
+        run: gradle --no-daemon :android:assembleDebug
+      - name: Verify APK
         run: |
-          APK="$(find . -type f -name '*.apk' -print -quit)"
-          test -n "$APK" && test -s "$APK"
+          APK="android/build/outputs/apk/debug/android-debug.apk"
+          test -s "$APK"
           ls -lh "$APK"
-          stat -c 'APK size: %s bytes' "$APK"
           echo "APK_PATH=$APK" >> "$GITHUB_ENV"
-      - name: Publish APK
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AETHER-Android-APK
+          path: android/build/outputs/apk/debug/android-debug.apk
+          if-no-files-found: error
+      - name: Publish APK release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="unity-android-${GITHUB_RUN_NUMBER}"
-          gh release create "$TAG" "$APK_PATH" --repo "$GITHUB_REPOSITORY" --title "AETHER Unity Android ${GITHUB_RUN_NUMBER}" --notes "Unity Android APK. Commit ${GITHUB_SHA}."
+          TAG="libgdx-android-${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" "$APK_PATH" --repo "$GITHUB_REPOSITORY" --title "AETHER Android ${GITHUB_RUN_NUMBER}" --notes "License-free libGDX Android APK. Commit ${GITHUB_SHA}."
