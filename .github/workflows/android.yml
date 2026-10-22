@@ -31,11 +31,20 @@ jobs:
         run: |
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "cmdline-tools;latest" "platform-tools" "platforms;android-35" "build-tools;35.0.0" "cmake;3.10.2.4988404" "ndk;28.1.13356709"
+          SDK_TOOLS_ROOT="$ANDROID_HOME/cmdline-tools"
+          if [ ! -d "$SDK_TOOLS_ROOT/latest" ]; then
+            TOOLS_VERSION="$(find "$SDK_TOOLS_ROOT" -mindepth 1 -maxdepth 1 -type d ! -name latest -printf '%f\n' | sort -V | tail -n 1)"
+            test -n "$TOOLS_VERSION"
+            ln -s "$TOOLS_VERSION" "$SDK_TOOLS_ROOT/latest"
+          fi
+          test -d "$ANDROID_HOME/platform-tools"
           test -d "$ANDROID_HOME/platforms/android-35"
           test -d "$ANDROID_HOME/build-tools/35.0.0"
+          test -d "$ANDROID_HOME/cmdline-tools/latest"
           test -d "$ANDROID_HOME/cmake/3.10.2.4988404"
           test -d "$ANDROID_HOME/ndk/28.1.13356709"
-
+          test -x "$JAVA_HOME/bin/java"
+          ls -l "$SDK_TOOLS_ROOT"
       - name: Install Godot and Android export templates
         run: |
           sudo apt-get update
@@ -59,6 +68,9 @@ jobs:
           [resource]
           export/android/android_sdk_path = "$ANDROID_HOME"
           export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "$HOME/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
           EOF
           keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
             -storepass android -alias androiddebugkey -keypass android \
