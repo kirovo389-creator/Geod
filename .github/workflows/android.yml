@@ -25,7 +25,7 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Install Android SDK packages
-        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+        run: sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Install Godot and export templates
         run: |
@@ -37,20 +37,24 @@ jobs:
           mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
           unzip -q /tmp/templates.tpz -d /tmp/godot-templates
           cp -a /tmp/godot-templates/templates/. "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
-          mkdir -p "$HOME/.config/godot"
+          mkdir -p "$HOME/.config/godot" "$HOME/.android"
           cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
           [gd_resource type="EditorSettings" format=3]
+
           [resource]
           export/android/android_sdk_path = "$ANDROID_HOME"
           export/android/java_sdk_path = "$JAVA_HOME"
           EOF
           godot --version
+          cat "$HOME/.config/godot/editor_settings-4.tres"
+          test -d "$ANDROID_HOME/platforms/android-34"
+          test -d "$ANDROID_HOME/build-tools/34.0.0"
 
       - name: Import project and export APK
         run: |
           godot --headless --path . --editor --import --quit
           mkdir -p build
-          godot --headless --path . --export-debug "Android" "$PWD/build/Aether.apk"
+          godot --headless --verbose --path . --export-debug "Android" "$PWD/build/Aether.apk"
           test -s build/Aether.apk
 
       - name: Publish GitHub Release
