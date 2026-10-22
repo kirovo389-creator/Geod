@@ -1,6 +1,7 @@
 extends Node3D
 
 const SPEED := 6.0
+var game_started := false
 var player: CharacterBody3D
 var camera: Camera3D
 var joy := Vector2.ZERO
@@ -163,7 +164,93 @@ func make_ui() -> void:
 	take.pressed.connect(collect_nearby)
 	root.add_child(take)
 
+	var menu_ui := Control.new()
+	menu_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(menu_ui)
+
+	var backdrop := ColorRect.new()
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0.025, 0.05, 0.11, 0.985)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+	menu_ui.add_child(backdrop)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	menu_ui.add_child(center)
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(440, 390)
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.055, 0.105, 0.19, 0.98)
+	panel_style.border_color = Color(0.15, 0.78, 0.95, 0.9)
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(24)
+	panel_style.content_margin_left = 28
+	panel_style.content_margin_right = 28
+	panel_style.content_margin_top = 26
+	panel_style.content_margin_bottom = 26
+	panel.add_theme_stylebox_override("panel", panel_style)
+	center.add_child(panel)
+
+	var stack := VBoxContainer.new()
+	stack.alignment = BoxContainer.ALIGNMENT_CENTER
+	stack.add_theme_constant_override("separation", 18)
+	panel.add_child(stack)
+
+	var logo := Label.new()
+	logo.text = "AETHER"
+	logo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	logo.add_theme_font_size_override("font_size", 48)
+	logo.add_theme_color_override("font_color", Color(0.5, 0.9, 1.0))
+	stack.add_child(logo)
+
+	var subtitle := Label.new()
+	subtitle.text = "ОСКОЛКИ НЕБА"
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.add_theme_font_size_override("font_size", 22)
+	subtitle.add_theme_color_override("font_color", Color(0.91, 0.96, 1.0))
+	stack.add_child(subtitle)
+
+	var story := Label.new()
+	story.text = "Исследуй древний остров в облаках\nи собери 8 светящихся кристаллов."
+	story.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	story.add_theme_font_size_override("font_size", 17)
+	story.add_theme_color_override("font_color", Color(0.71, 0.81, 0.91))
+	stack.add_child(story)
+
+	var play := Button.new()
+	play.text = "ИГРАТЬ"
+	play.custom_minimum_size = Vector2(270, 62)
+	play.add_theme_font_size_override("font_size", 23)
+	play.add_theme_color_override("font_color", Color(0.02, 0.08, 0.14))
+	var play_style := StyleBoxFlat.new()
+	play_style.bg_color = Color(0.24, 0.84, 0.98)
+	play_style.set_corner_radius_all(16)
+	play_style.content_margin_top = 12
+	play_style.content_margin_bottom = 12
+	play.add_theme_stylebox_override("normal", play_style)
+	var hover_style := play_style.duplicate() as StyleBoxFlat
+	hover_style.bg_color = Color(0.48, 0.91, 1.0)
+	play.add_theme_stylebox_override("hover", hover_style)
+	play.add_theme_stylebox_override("pressed", hover_style)
+	play.pressed.connect(func():
+		game_started = true
+		menu_ui.queue_free()
+	)
+	stack.add_child(play)
+
+	var hints := Label.new()
+	hints.text = "Управление: левая сторона — движение\nправая — обзор • JUMP — прыжок • TAKE — взять"
+	hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hints.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hints.add_theme_font_size_override("font_size", 13)
+	hints.add_theme_color_override("font_color", Color(0.61, 0.73, 0.85))
+	stack.add_child(hints)
+
 func _input(e: InputEvent) -> void:
+	if not game_started:
+		return
 	if e is InputEventScreenTouch:
 		if e.pressed:
 			if e.position.x < get_viewport().get_visible_rect().size.x*0.4 and joy_id == -1:
@@ -191,6 +278,8 @@ func _input(e: InputEvent) -> void:
 		pitch = clampf(pitch-e.relative.y*0.004,-1.0,0.7)
 
 func _physics_process(delta: float) -> void:
+	if not game_started:
+		return
 	if not is_instance_valid(player):
 		return
 	var v := joy
