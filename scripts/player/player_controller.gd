@@ -66,6 +66,12 @@ func _build_view_hands() -> void:
 	_add_hand_piece("Right_Glove", Vector3(0.17, -0.80, -1.00), Vector3(0.20, 0.14, 0.20), Color(0.13, 0.39, 0.45))
 	_add_hand_piece("Left_Cuff", Vector3(-0.24, -0.70, -0.91), Vector3(0.18, 0.14, 0.18), Color(0.84, 0.66, 0.27))
 	_add_hand_piece("Right_Cuff", Vector3(0.24, -0.70, -0.91), Vector3(0.18, 0.14, 0.18), Color(0.84, 0.66, 0.27))
+	for finger_index in range(4):
+		var finger_offset := -0.066 + float(finger_index) * 0.044
+		_add_hand_digit("Left_Finger_%d" % finger_index, Vector3(-0.17 + finger_offset, -0.815, -1.105), 0.0)
+		_add_hand_digit("Right_Finger_%d" % finger_index, Vector3(0.17 + finger_offset, -0.815, -1.105), 0.0)
+	_add_hand_digit("Left_Thumb", Vector3(-0.285, -0.805, -1.055), -0.48)
+	_add_hand_digit("Right_Thumb", Vector3(0.285, -0.805, -1.055), 0.48)
 
 	cleaning_tool = MeshInstance3D.new()
 	cleaning_tool.name = "CleaningSponge"
@@ -112,6 +118,27 @@ func _add_hand_piece(part_name: String, pos: Vector3, dimensions: Vector3, tint:
 	material.roughness = 0.8
 	piece.material_override = material
 	view_hands.add_child(piece)
+
+
+
+
+
+func _add_hand_digit(part_name: String, pos: Vector3, rotation_z: float) -> void:
+	var digit := MeshInstance3D.new()
+	digit.name = part_name
+	var capsule := CapsuleMesh.new()
+	capsule.radius = 0.022
+	capsule.height = 0.105
+	capsule.radial_segments = 8
+	capsule.rings = 4
+	digit.mesh = capsule
+	digit.position = pos
+	digit.rotation = Vector3(1.5708, 0.0, rotation_z)
+	var glove_material := StandardMaterial3D.new()
+	glove_material.albedo_color = Color(0.10, 0.14, 0.15)
+	glove_material.roughness = 0.9
+	digit.material_override = glove_material
+	view_hands.add_child(digit)
 
 
 func play_interaction_animation(action: String) -> void:
@@ -219,8 +246,9 @@ func _physics_process(delta: float) -> void:
 	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
 		keyboard.y += 1.0
 	var input_vector := (keyboard + Vector2(move_touch.x, move_touch.y)).limit_length(1.0)
-	var forward := Vector3(sin(yaw), 0.0, -cos(yaw))
-	var right := Vector3(cos(yaw), 0.0, sin(yaw))
+	# Match movement axes to Camera3D's actual rotated -Z forward vector.
+	var forward := Vector3(-sin(yaw), 0.0, -cos(yaw))
+	var right := Vector3(cos(yaw), 0.0, -sin(yaw))
 	var direction := (right * input_vector.x + forward * -input_vector.y).normalized()
 	var has_large_item := GameState.carried_item_for(NetworkManager.local_actor_id()) != ""
 	var wants_sprint := sprinting or Input.is_key_pressed(KEY_SHIFT)
