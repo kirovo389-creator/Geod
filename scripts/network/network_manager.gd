@@ -105,7 +105,7 @@ func _server_process_action(actor_id: int, action: String, target_id: String) ->
 		return
 	if not GameState.can_apply_action(action, target_id, actor_id):
 		if actor_id == local_actor_id():
-			GameState.toast_requested.emit("Это действие сейчас недоступно.")
+			GameState.toast_requested.emit(GameState.action_failure_text(action, target_id, actor_id))
 		return
 	GameState.perform_action(action, target_id, actor_id, world.get_actor_position(actor_id))
 
@@ -190,8 +190,10 @@ func _on_peer_connected(peer_id: int) -> void:
 	var world := get_tree().get_first_node_in_group("mission_world")
 	if world != null:
 		world.add_remote_player(peer_id)
-		rpc("remote_player_joined", peer_id)
-		call_deferred("_send_initial_snapshot", peer_id)
+		# Only the host may call authority-owned RPCs. The joining client asks
+		# for the mission snapshot from connected_to_server().
+		if multiplayer.is_server():
+			rpc("remote_player_joined", peer_id)
 	set_status("Игрок подключился. В комнате: 2/2")
 
 

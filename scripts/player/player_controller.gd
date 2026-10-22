@@ -28,6 +28,10 @@ var stamina := 100.0
 var focus_id := ""
 var focus_info: Dictionary = {}
 var carry_visual: Node3D
+var view_hands: Node3D
+var cleaning_tool: MeshInstance3D
+var hands_tween: Tween
+var walk_phase := 0.0
 var position_sync_timer := 0.0
 
 
@@ -38,6 +42,7 @@ func _ready() -> void:
 	ray.target_position = Vector3(0, 0, -3.2)
 	yaw = rotation.y
 	_apply_sensitivity()
+	_build_view_hands()
 
 
 func _apply_sensitivity() -> void:
@@ -46,6 +51,94 @@ func _apply_sensitivity() -> void:
 
 
 var look_sensitivity := 0.004
+
+
+func _build_view_hands() -> void:
+	view_hands = Node3D.new()
+	view_hands.name = "FirstPersonHands"
+	camera.add_child(view_hands)
+
+	_add_forearm("Left_Sleeve", Vector3(-0.37, -0.54, -0.76), 0.64, Color(0.12, 0.24, 0.30))
+	_add_forearm("Right_Sleeve", Vector3(0.37, -0.54, -0.76), -0.64, Color(0.12, 0.24, 0.30))
+	_add_hand_piece("Left_Glove", Vector3(-0.17, -0.80, -1.00), Vector3(0.20, 0.14, 0.20), Color(0.13, 0.39, 0.45))
+	_add_hand_piece("Right_Glove", Vector3(0.17, -0.80, -1.00), Vector3(0.20, 0.14, 0.20), Color(0.13, 0.39, 0.45))
+	_add_hand_piece("Left_Cuff", Vector3(-0.24, -0.70, -0.91), Vector3(0.18, 0.14, 0.18), Color(0.84, 0.66, 0.27))
+	_add_hand_piece("Right_Cuff", Vector3(0.24, -0.70, -0.91), Vector3(0.18, 0.14, 0.18), Color(0.84, 0.66, 0.27))
+
+	cleaning_tool = MeshInstance3D.new()
+	cleaning_tool.name = "CleaningSponge"
+	var sponge_mesh := BoxMesh.new()
+	sponge_mesh.size = Vector3(0.18, 0.07, 0.12)
+	cleaning_tool.mesh = sponge_mesh
+	cleaning_tool.position = Vector3(-0.22, -0.78, -1.12)
+	cleaning_tool.rotation_degrees = Vector3(-12, 18, -18)
+	cleaning_tool.visible = false
+	var sponge_material := StandardMaterial3D.new()
+	sponge_material.albedo_color = Color(0.98, 0.72, 0.18)
+	sponge_material.roughness = 0.72
+	cleaning_tool.material_override = sponge_material
+	view_hands.add_child(cleaning_tool)
+
+
+func _add_forearm(part_name: String, pos: Vector3, roll: float, tint: Color) -> void:
+	var forearm := MeshInstance3D.new()
+	forearm.name = part_name
+	var capsule := CapsuleMesh.new()
+	capsule.radius = 0.105
+	capsule.height = 0.66
+	capsule.radial_segments = 8
+	capsule.rings = 4
+	forearm.mesh = capsule
+	forearm.position = pos
+	forearm.rotation.z = roll
+	var material := StandardMaterial3D.new()
+	material.albedo_color = tint
+	material.roughness = 0.84
+	forearm.material_override = material
+	view_hands.add_child(forearm)
+
+
+func _add_hand_piece(part_name: String, pos: Vector3, dimensions: Vector3, tint: Color) -> void:
+	var piece := MeshInstance3D.new()
+	piece.name = part_name
+	var shape := BoxMesh.new()
+	shape.size = dimensions
+	piece.mesh = shape
+	piece.position = pos
+	var material := StandardMaterial3D.new()
+	material.albedo_color = tint
+	material.roughness = 0.8
+	piece.material_override = material
+	view_hands.add_child(piece)
+
+
+func play_interaction_animation(action: String) -> void:
+	if not is_instance_valid(view_hands):
+		return
+	if is_instance_valid(hands_tween) and hands_tween.is_running():
+		hands_tween.kill()
+	if is_instance_valid(cleaning_tool):
+		cleaning_tool.visible = action == "clean"
+	hands_tween = create_tween()
+	hands_tween.tween_property(view_hands, "position", Vector3(0.0, -0.045, -0.16), 0.09)
+	hands_tween.tween_property(view_hands, "position", Vector3.ZERO, 0.16)
+	hands_tween.tween_callback(func():
+		if is_instance_valid(cleaning_tool):
+			cleaning_tool.visible = false
+	)
+
+
+func _animate_view_hands(delta: float, movement_amount: float) -> void:
+	if not is_instance_valid(view_hands):
+		return
+	if is_instance_valid(hands_tween) and hands_tween.is_running():
+		return
+	if movement_amount > 0.05:
+		walk_phase += delta * (12.0 if sprinting else 7.5)
+	var sway := sin(walk_phase) * 0.012 * clampf(movement_amount, 0.0, 1.0)
+	var target_position := Vector3(0.0, sway, 0.0)
+	view_hands.position = view_hands.position.lerp(target_position, clampf(delta * 8.0, 0.0, 1.0))
+	view_hands.rotation.z = move_toward(view_hands.rotation.z, sin(walk_phase * 0.5) * 0.012, delta * 0.08)
 
 
 func set_control_enabled(enabled: bool) -> void:
@@ -148,6 +241,7 @@ func _physics_process(delta: float) -> void:
 	rotation.y = yaw
 	camera.rotation.x = pitch
 	move_and_slide()
+	_animate_view_hands(delta, direction.length())
 
 	if global_position.y < -5.0:
 		global_position = Vector3(0, 0.15, 4.5)
@@ -192,7 +286,9 @@ func perform_primary_action() -> void:
 	if focus_id.is_empty():
 		GameState.toast_requested.emit("Посмотри на предмет поближе и нажми «Использовать».")
 		return
-	action_requested.emit(str(focus_info.get("action", "")), focus_id)
+	var action := str(focus_info.get("action", ""))
+	play_interaction_animation(action)
+	action_requested.emit(action, focus_id)
 
 
 func update_carried_item(item_id: String) -> void:

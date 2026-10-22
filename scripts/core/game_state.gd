@@ -28,6 +28,7 @@ const ITEM_CATALOG := {
 	"loot_tablet": {"title": "Планшет", "kind": "small", "value": 180, "weight": 0.65},
 	"loot_camera": {"title": "Фотоаппарат", "kind": "medium", "value": 290, "weight": 1.8},
 	"loot_vase": {"title": "Декоративная ваза", "kind": "medium", "value": 130, "weight": 2.6},
+	"loot_wallet": {"title": "Кошелёк с мелочью", "kind": "small", "value": 80, "weight": 0.18},
 	"loot_tv": {"title": "Большой телевизор", "kind": "large", "value": 620, "weight": 18.0},
 	"loot_speaker": {"title": "Напольная колонка", "kind": "large", "value": 380, "weight": 12.0}
 }
@@ -173,7 +174,7 @@ func _backpack_has_room(actor_id: int, target_id: String) -> bool:
 
 func perform_action(action: String, target_id: String, actor_id: int, actor_position: Vector3 = Vector3.ZERO) -> bool:
 	if not can_apply_action(action, target_id, actor_id):
-		toast_requested.emit(_action_failure_text(action, target_id, actor_id))
+		toast_requested.emit(action_failure_text(action, target_id, actor_id))
 		return false
 
 	match action:
@@ -226,7 +227,7 @@ func perform_action(action: String, target_id: String, actor_id: int, actor_posi
 	return true
 
 
-func _action_failure_text(action: String, target_id: String, actor_id: int) -> String:
+func action_failure_text(action: String, target_id: String, actor_id: int) -> String:
 	if action == "pick_small":
 		if backpack_for(actor_id).size() >= BACKPACK_SLOTS:
 			return "Рюкзак заполнен. Оставь место для других вещей."

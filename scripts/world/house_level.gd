@@ -146,7 +146,8 @@ func _build_shell() -> void:
 	_add_box(self, "Partition_Living_Right", Vector3(5.05, 1.45, -1.7), Vector3(7.9, 2.9, 0.18), Color(0.81, 0.78, 0.69))
 	_add_box(self, "Bedroom_Partition_Back", Vector3(3.2, 1.45, -6.9), Vector3(0.18, 2.9, 2.1), Color(0.76, 0.75, 0.70))
 	_add_box(self, "Bedroom_Partition_Front", Vector3(3.2, 1.45, -3.3), Vector3(0.18, 2.9, 2.9), Color(0.76, 0.75, 0.70))
-	_add_box(self, "Bath_Partition", Vector3(6.1, 1.45, -5.1), Vector3(5.8, 2.9, 0.16), Color(0.75, 0.79, 0.77))
+	_add_box(self, "Bath_Partition_Left", Vector3(4.25, 1.45, -5.1), Vector3(2.1, 2.9, 0.16), Color(0.75, 0.79, 0.77))
+	_add_box(self, "Bath_Partition_Right", Vector3(7.65, 1.45, -5.1), Vector3(2.7, 2.9, 0.16), Color(0.75, 0.79, 0.77))
 
 	# Window recesses and glass are simple reusable meshes for the mobile renderer.
 	_add_box(self, "Living_Window_Frame", Vector3(-7.2, 1.95, 1.2), Vector3(0.06, 1.25, 2.2), Color(0.29, 0.22, 0.16), false)
@@ -293,6 +294,7 @@ func _build_targets() -> void:
 	_make_target("loot_tablet", "Планшет", "pick_small", Vector3(-3.20, 1.10, -5.65), Vector3(0.52, 0.07, 0.34), Color(0.07, 0.11, 0.15), "tablet")
 	_make_target("loot_camera", "Фотоаппарат", "pick_small", Vector3(0.58, 1.02, -3.32), Vector3(0.34, 0.25, 0.24), Color(0.09, 0.12, 0.13), "camera")
 	_make_target("loot_vase", "Декоративная ваза", "pick_small", Vector3(1.0, 1.15, -3.32), Vector3(0.25, 0.48, 0.25), Color(0.47, 0.27, 0.19), "vase")
+	_make_target("loot_wallet", "Кошелёк с мелочью", "pick_small", Vector3(7.8, 1.42, -2.4), Vector3(0.32, 0.12, 0.22), Color(0.31, 0.17, 0.09), "wallet")
 	_make_target("loot_tv", "Большой телевизор", "carry_large", Vector3(4.1, 1.38, 3.02), Vector3(1.65, 0.96, 0.18), Color(0.045, 0.055, 0.062), "tv")
 	_make_target("loot_speaker", "Напольная колонка", "carry_large", Vector3(7.0, 0.69, 2.5), Vector3(0.56, 1.25, 0.48), Color(0.11, 0.13, 0.14), "speaker")
 
@@ -331,6 +333,11 @@ func _make_target(target_id: String, title: String, action: String, pos: Vector3
 				vase_mesh.height = size.y
 				vase_mesh.radial_segments = 8
 				visual.mesh = vase_mesh
+			"wallet":
+				var wallet_mesh := BoxMesh.new()
+				wallet_mesh.size = size
+				visual.mesh = wallet_mesh
+				visual.rotation_degrees.y = -9.0
 			"tv":
 				var tv_mesh := BoxMesh.new()
 				tv_mesh.size = size
@@ -487,7 +494,8 @@ func _refresh_state() -> void:
 	var door_target: Node3D = targets.get("door_front")
 	if is_instance_valid(door_target):
 		var open := bool(GameState.doors.get("door_front", false))
-		door_target.visible = not open
+		door_target.visible = true
+		door_target.rotation.y = -1.18 if open else 0.0
 		var door_collision := door_target.get_node_or_null("CollisionShape3D") as CollisionShape3D
 		if door_collision != null:
 			door_collision.disabled = open

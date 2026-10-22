@@ -100,6 +100,7 @@ func _button(text: String, accent: Color, font_size := 17) -> Button:
 	pressed.shadow_size = 1
 	pressed.shadow_offset = Vector2(0, 1)
 	result.add_theme_stylebox_override("pressed", pressed)
+	result.pressed.connect(func(): AudioManager.play_event("ui"))
 	return result
 
 
