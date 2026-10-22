@@ -387,21 +387,6 @@ func reset_world() -> void:
 		car_root.position = Vector3(-4.4, 0, 11.3)
 	if is_instance_valid(trunk_lid):
 		trunk_lid.rotation = Vector3.ZERO
-	if is_instance_valid(owner_car_root):func open_mission_door() -> void:
-	GameState.doors["door_front"] = true
-	_refresh_state()
-
-
-func reset_world() -> void:
-	departure_started = false
-	previous_item_states.clear()
-	for item_id in GameState.items:
-		GameState.items[item_id].erase("world_position")
-	if is_instance_valid(car_root):
-		car_root.visible = true
-		car_root.position = Vector3(-4.4, 0, 11.3)
-	if is_instance_valid(trunk_lid):
-		trunk_lid.rotation = Vector3.ZERO
 	if is_instance_valid(owner_car_root):
 		owner_car_root.visible = true
 		owner_car_root.position = Vector3(4.4, 0, 11.3)
@@ -425,7 +410,6 @@ func set_quality_mode(quality: String) -> void:
 	if environment_ref != null:
 		environment_ref.glow_enabled = quality != "Low"
 		environment_ref.glow_intensity = 0.24 if quality == "High" else 0.12
-	var lights := get_children()
-	for child in lights:
+	for child in get_children():
 		if child is OmniLight3D:
 			child.light_energy = 0.34 if quality == "Low" else 0.65
