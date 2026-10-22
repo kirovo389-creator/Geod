@@ -85,7 +85,7 @@ jobs:
           set -o pipefail
           godot --headless --editor --path . --import --quit 2>&1 | tee /tmp/godot-import.log
           godot --headless --path . --quit-after 10 --verbose 2>&1 | tee /tmp/godot-smoke.log
-          if grep -E 'SCRIPT ERROR:|Parse Error:' /tmp/godot-import.log /tmp/godot-smoke.log; then
+          if grep -Ei 'SCRIPT ERROR:|Parse Error:|SHADER ERROR:|shader compilation failed|error parsing shader' /tmp/godot-import.log /tmp/godot-smoke.log; then
             echo "Godot script smoke test failed."
             exit 1
           fi
