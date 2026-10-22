@@ -17,11 +17,14 @@ var counter: Label
 var message: Label
 const TOTAL := 8
 
-func mat(c: Color, metal := 0.0) -> StandardMaterial3D:
+func mat(c: Color, metal := 0.0, emissive := false) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = c
 	m.roughness = 0.72
 	m.metallic = metal
+	if emissive:
+		m.emission_enabled = true
+		m.emission = c
 	return m
 
 func block(parent: Node3D, p: Vector3, s: Vector3, c: Color) -> MeshInstance3D:
@@ -37,20 +40,14 @@ func block(parent: Node3D, p: Vector3, s: Vector3, c: Color) -> MeshInstance3D:
 func _ready() -> void:
 	# Render the menu before constructing the 3D world, avoiding a blank launch frame.
 	make_ui()
-	await RenderingServer.frame_post_draw
+	await get_tree().create_timer(0.5).timeout
 	_build_world()
 
 func _build_world() -> void:
 	var we := WorldEnvironment.new()
 	var env := Environment.new()
-	env.background_mode = Environment.BG_SKY
-	env.sky = Sky.new()
-	var sky := ProceduralSkyMaterial.new()
-	sky.sky_top_color = Color(0.06, 0.15, 0.4)
-	sky.sky_horizon_color = Color(0.5, 0.75, 0.94)
-	sky.ground_bottom_color = Color(0.08, 0.1, 0.2)
-	sky.ground_horizon_color = Color(0.35, 0.48, 0.62)
-	env.sky.sky_material = sky
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.5, 0.75, 0.94)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.6, 0.72, 0.9)
 	env.ambient_light_energy = 0.8
@@ -58,7 +55,7 @@ func _build_world() -> void:
 	add_child(we)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-48, -32, 0)
-	sun.shadow_enabled = true
+	sun.shadow_enabled = false
 	add_child(sun)
 	block(self, Vector3(0,-1.2,0), Vector3(30,2,30), Color(0.18,0.45,0.29))
 	var island_body := StaticBody3D.new()
@@ -87,13 +84,8 @@ func _build_world() -> void:
 		var prism := PrismMesh.new()
 		prism.size = Vector3(0.8,1.5,0.8)
 		shard.mesh = prism
-		shard.material_override = mat(Color(0.12,0.88,1.0),0.35)
+		shard.material_override = mat(Color(0.12,0.88,1.0),0.35,true)
 		crystal.add_child(shard)
-		var glow := OmniLight3D.new()
-		glow.light_color = Color(0.1,0.8,1)
-		glow.light_energy = 0.8
-		glow.omni_range = 4
-		crystal.add_child(glow)
 	for i in range(14):
 		var a := TAU*float(i)/14.0
 		var p := Vector3(cos(a)*10,0.3,sin(a)*10)

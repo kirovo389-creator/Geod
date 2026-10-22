@@ -71,6 +71,12 @@ jobs:
           unzip -t build/Aether.apk
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs build/Aether.apk
 
+      - name: Report APK size
+        run: |
+          echo "APK file size:"
+          ls -lh build/Aether.apk
+          stat -c 'APK size: %s bytes' build/Aether.apk
+
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
