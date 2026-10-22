@@ -37,6 +37,7 @@ func _ready() -> void:
 	player.phone_requested.connect(_toggle_phone)
 	player.pause_requested.connect(_pause_game)
 	player.drop_requested.connect(_drop_carried_item)
+	player.stamina_changed.connect(ui.set_stamina)
 	NetworkManager.status_changed.connect(ui.set_network_status)
 	NetworkManager.session_ended.connect(func(reason: String): ui.show_toast(reason))
 	GameState.state_changed.connect(_on_state_changed)

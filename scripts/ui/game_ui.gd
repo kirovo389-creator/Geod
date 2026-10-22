@@ -30,6 +30,7 @@ var status_label: Label
 var objective_label: Label
 var task_label: Label
 var money_label: Label
+var stamina_bar: ProgressBar
 var focus_label: Label
 var use_button: Button
 var drop_button: Button
@@ -299,6 +300,44 @@ func _build_hud() -> void:
 	money_label.add_theme_font_size_override("font_size", 13)
 	money_label.add_theme_color_override("font_color", Color(0.52, 0.84, 0.64))
 	left_stack.add_child(money_label)
+
+	var stamina_caption := Label.new()
+	stamina_caption.anchor_left = 1.0
+	stamina_caption.anchor_right = 1.0
+	stamina_caption.anchor_top = 0.0
+	stamina_caption.anchor_bottom = 0.0
+	stamina_caption.offset_left = -298
+	stamina_caption.offset_top = 82
+	stamina_caption.offset_right = -24
+	stamina_caption.offset_bottom = 101
+	stamina_caption.text = "ЭНЕРГИЯ РЫВКА"
+	stamina_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	stamina_caption.add_theme_font_size_override("font_size", 12)
+	stamina_caption.add_theme_color_override("font_color", Color(0.76, 0.90, 0.95))
+	hud_layer.add_child(stamina_caption)
+
+	stamina_bar = ProgressBar.new()
+	stamina_bar.anchor_left = 1.0
+	stamina_bar.anchor_right = 1.0
+	stamina_bar.anchor_top = 0.0
+	stamina_bar.anchor_bottom = 0.0
+	stamina_bar.offset_left = -298
+	stamina_bar.offset_top = 104
+	stamina_bar.offset_right = -24
+	stamina_bar.offset_bottom = 123
+	stamina_bar.min_value = 0.0
+	stamina_bar.max_value = 100.0
+	stamina_bar.value = 100.0
+	stamina_bar.show_percentage = false
+	var stamina_bg := StyleBoxFlat.new()
+	stamina_bg.bg_color = Color(0.025, 0.05, 0.08, 0.75)
+	stamina_bg.set_corner_radius_all(7)
+	stamina_bar.add_theme_stylebox_override("background", stamina_bg)
+	var stamina_fill := StyleBoxFlat.new()
+	stamina_fill.bg_color = Color(0.32, 0.80, 0.66)
+	stamina_fill.set_corner_radius_all(7)
+	stamina_bar.add_theme_stylebox_override("fill", stamina_fill)
+	hud_layer.add_child(stamina_bar)
 
 	var pause := _button("Ⅱ", Color(0.25, 0.35, 0.44), 21)
 	pause.anchor_left = 1.0
@@ -883,6 +922,11 @@ func show_toast(text: String) -> void:
 	toast_label.text = text
 	toast_label.visible = true
 	toast_timer.start()
+
+
+func set_stamina(value: float) -> void:
+	if is_instance_valid(stamina_bar):
+		stamina_bar.value = clampf(value, 0.0, 100.0)
 
 
 func set_network_status(text: String) -> void:

@@ -6,6 +6,7 @@ signal phone_requested
 signal pause_requested
 signal sprint_changed(held: bool)
 signal drop_requested
+signal stamina_changed(value: float)
 
 const WALK_SPEED := 4.7
 const SPRINT_SPEED := 6.8
@@ -231,6 +232,7 @@ func _physics_process(delta: float) -> void:
 		stamina = maxf(0.0, stamina - 28.0 * delta)
 	else:
 		stamina = minf(100.0, stamina + 19.0 * delta)
+	stamina_changed.emit(stamina)
 
 	velocity.x = direction.x * speed
 	velocity.z = direction.z * speed

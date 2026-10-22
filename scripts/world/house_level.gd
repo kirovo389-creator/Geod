@@ -205,6 +205,7 @@ func _build_furniture() -> void:
 	_add_box(self, "Bed_Pillow_Left", Vector3(5.35, 0.83, -4.02), Vector3(0.72, 0.16, 0.5), Color(0.91, 0.87, 0.77), false)
 	_add_box(self, "Bed_Pillow_Right", Vector3(6.45, 0.83, -4.02), Vector3(0.72, 0.16, 0.5), Color(0.91, 0.87, 0.77), false)
 	_add_box(self, "Bedroom_Cabinet", Vector3(7.9, 0.68, -2.45), Vector3(0.85, 1.32, 0.75), Color(0.43, 0.29, 0.19), true)
+	_add_box(self, "Bedroom_Nightstand", Vector3(4.8, 0.42, -2.2), Vector3(0.75, 0.84, 0.65), Color(0.42, 0.28, 0.18), true, 0.5)
 	_add_box(self, "Bathroom_Vanity", Vector3(7.6, 0.55, -6.8), Vector3(1.8, 1.0, 0.75), Color(0.76, 0.78, 0.73), true)
 	_add_box(self, "Bathroom_Sink", Vector3(7.6, 1.08, -6.8), Vector3(1.55, 0.10, 0.62), Color(0.86, 0.87, 0.84), true, 0.22, 0.06)
 	_add_box(self, "Bathroom_Mirror", Vector3(7.6, 1.95, -7.45), Vector3(1.25, 1.15, 0.07), Color(0.44, 0.63, 0.67), false, 0.1, 0.62)
@@ -242,7 +243,7 @@ func _build_car() -> void:
 	trunk_content.name = "LoadedCargo"
 	car_root.add_child(trunk_content)
 
-	_make_target("car_trunk", "Багажник фургона", "trunk", Vector3(-4.4, 0.95, 13.6), Vector3(1.6, 1.1, 0.55), Color(0.0, 0.0, 0.0, 0.01), "invisible")
+	_make_target("car_trunk", "Багажник фургона", "trunk", Vector3(-4.4, 1.25, 13.6), Vector3(1.6, 1.1, 0.55), Color(0.0, 0.0, 0.0, 0.01), "invisible")
 
 	# The client's car is separate so the employee's van remains parked for loading.
 	owner_car_root = Node3D.new()
@@ -294,7 +295,7 @@ func _build_targets() -> void:
 	_make_target("loot_tablet", "Планшет", "pick_small", Vector3(-3.20, 1.10, -5.65), Vector3(0.52, 0.07, 0.34), Color(0.07, 0.11, 0.15), "tablet")
 	_make_target("loot_camera", "Фотоаппарат", "pick_small", Vector3(0.58, 1.02, -3.32), Vector3(0.34, 0.25, 0.24), Color(0.09, 0.12, 0.13), "camera")
 	_make_target("loot_vase", "Декоративная ваза", "pick_small", Vector3(1.0, 1.15, -3.32), Vector3(0.25, 0.48, 0.25), Color(0.47, 0.27, 0.19), "vase")
-	_make_target("loot_wallet", "Кошелёк с мелочью", "pick_small", Vector3(7.8, 1.42, -2.4), Vector3(0.32, 0.12, 0.22), Color(0.31, 0.17, 0.09), "wallet")
+	_make_target("loot_wallet", "Кошелёк с мелочью", "pick_small", Vector3(4.8, 0.92, -2.2), Vector3(0.32, 0.12, 0.22), Color(0.31, 0.17, 0.09), "wallet")
 	_make_target("loot_tv", "Большой телевизор", "carry_large", Vector3(4.1, 1.38, 3.02), Vector3(1.65, 0.96, 0.18), Color(0.045, 0.055, 0.062), "tv")
 	_make_target("loot_speaker", "Напольная колонка", "carry_large", Vector3(7.0, 0.69, 2.5), Vector3(0.56, 1.25, 0.48), Color(0.11, 0.13, 0.14), "speaker")
 

@@ -46,6 +46,9 @@ for required in (
 player = (ROOT / "scripts/player/player_controller.gd").read_text(encoding="utf-8")
 require("func _build_view_hands" in player, "First-person hand meshes are missing.")
 require("func play_interaction_animation" in player, "Interaction animation is missing.")
+require("signal stamina_changed(value: float)" in player, "Stamina HUD signal is missing.")
+ui = (ROOT / "scripts/ui/game_ui.gd").read_text(encoding="utf-8")
+require("ЭНЕРГИЯ РЫВКА" in ui and "func set_stamina" in ui, "Stamina HUD is not wired.")
 audio = (ROOT / "scripts/core/audio_manager.gd").read_text(encoding="utf-8")
 require("func play_event" in audio and "AudioStreamWAV" in audio, "Generated interaction audio is missing.")
 

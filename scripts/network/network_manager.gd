@@ -23,6 +23,7 @@ func _ready() -> void:
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	GameState.state_changed.connect(_on_game_state_changed)
+	GameState.toast_requested.connect(_on_game_toast)
 
 
 func is_network_active() -> bool:
@@ -80,7 +81,8 @@ func close_session() -> void:
 
 func request_game_action(action: String, target_id: String) -> void:
 	if not is_network_active():
-		GameState.perform_action(action, target_id, 1, _local_player_position())
+		if GameState.perform_action(action, target_id, 1, _local_player_position()):
+			AudioManager.play_event("success" if GameState.phase == GameState.Phase.COMPLETE else action)
 		return
 	if multiplayer.is_server():
 		_server_process_action(1, action, target_id)
@@ -99,15 +101,43 @@ func _server_process_action(actor_id: int, action: String, target_id: String) ->
 	if not multiplayer.is_server() and is_network_active():
 		return
 	var world := get_tree().get_first_node_in_group("mission_world")
-	if world == null or not world.can_actor_interact(actor_id, target_id, action):
-		if actor_id == local_actor_id():
-			GameState.toast_requested.emit("Подойди ближе к объекту.")
+	if world == null:
+		_report_action_failure(actor_id, "Миссия ещё загружается. Повтори действие.")
+		return
+	if not world.can_actor_interact(actor_id, target_id, action):
+		_report_action_failure(actor_id, "Подойди ближе к объекту.")
 		return
 	if not GameState.can_apply_action(action, target_id, actor_id):
-		if actor_id == local_actor_id():
-			GameState.toast_requested.emit(GameState.action_failure_text(action, target_id, actor_id))
+		_report_action_failure(actor_id, GameState.action_failure_text(action, target_id, actor_id))
 		return
-	GameState.perform_action(action, target_id, actor_id, world.get_actor_position(actor_id))
+	var succeeded := GameState.perform_action(action, target_id, actor_id, world.get_actor_position(actor_id))
+	if succeeded:
+		var sound_name := "success" if GameState.phase == GameState.Phase.COMPLETE else action
+		AudioManager.play_event(sound_name)
+		if is_network_active() and multiplayer.is_server():
+			rpc("client_action_sound", sound_name)
+
+
+func _report_action_failure(actor_id: int, feedback: String) -> void:
+	if is_network_active() and multiplayer.is_server() and actor_id != local_actor_id():
+		rpc_id(actor_id, "client_toast", feedback)
+	else:
+		GameState.toast_requested.emit(feedback)
+
+
+func _on_game_toast(feedback: String) -> void:
+	if is_network_active() and multiplayer.is_server():
+		rpc("client_toast", feedback)
+
+
+@rpc("authority", "call_remote", "reliable")
+func client_toast(feedback: String) -> void:
+	GameState.toast_requested.emit(feedback)
+
+
+@rpc("authority", "call_remote", "reliable")
+func client_action_sound(sound_name: String) -> void:
+	AudioManager.play_event(sound_name)
 
 
 @rpc("any_peer", "call_remote", "reliable")
