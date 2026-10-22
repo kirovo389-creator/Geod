@@ -1,9 +1,8 @@
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-UserSettings/
-*.apk
-*.aab
+# Godot editor and import cache
+.godot/
+.import/
+
+# Exported builds
+/build/
+/*.apk
+/*.aab
