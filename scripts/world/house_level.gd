@@ -10,6 +10,8 @@ var car_root: Node3D
 var owner_car_root: Node3D
 var owner_npc: Node3D
 var trunk_content: Node3D
+var trunk_lid: Node3D
+var trunk_tween: Tween
 var loaded_signature := ""
 var departure_started := false
 var default_target_positions: Dictionary = {}
@@ -226,6 +228,12 @@ func _build_car() -> void:
 	_add_visual_box(car_root, "Rear_Windshield", Vector3(0, 1.49, 0.86), Vector3(1.52, 0.37, 0.035), Color(0.12, 0.23, 0.28), 0.16, 0.1)
 	_add_visual_box(car_root, "Van_Bumper", Vector3(0, 0.37, 2.10), Vector3(2.12, 0.20, 0.15), Color(0.12, 0.14, 0.15), 0.38, 0.2)
 	_add_visual_box(car_root, "Trunk_Interior", Vector3(0, 1.18, 1.66), Vector3(1.48, 0.28, 0.50), Color(0.045, 0.055, 0.065), 0.9)
+	trunk_lid = Node3D.new()
+	trunk_lid.name = "AnimatedTrunkLid"
+	trunk_lid.position = Vector3(0, 1.20, 2.08)
+	car_root.add_child(trunk_lid)
+	_add_visual_box(trunk_lid, "Trunk_Lid_Panel", Vector3(0, 0.25, 0.0), Vector3(1.58, 0.62, 0.12), Color(0.11, 0.23, 0.29), 0.38, 0.14)
+	_add_visual_box(trunk_lid, "Trunk_Lid_Inner", Vector3(0, 0.25, -0.065), Vector3(1.38, 0.43, 0.025), Color(0.045, 0.06, 0.07), 0.88)
 	for side in [-1.0, 1.0]:
 		for z_offset in [-1.28, 1.28]:
 			var wheel := MeshInstance3D.new()
@@ -401,6 +409,7 @@ func _on_player_action_requested(action: String, target_id: String) -> void:
 	elif action == "carry_large":
 		NetworkManager.request_game_action("carry_large", target_id)
 	elif action == "trunk":
+		animate_trunk()
 		NetworkManager.request_game_action("trunk", target_id)
 
 
@@ -547,6 +556,17 @@ func _finish_clean_animation(target_id: String, target: Node3D) -> void:
 		target.visible = false
 
 
+func animate_trunk() -> void:
+	if not is_instance_valid(trunk_lid):
+		return
+	if is_instance_valid(trunk_tween) and trunk_tween.is_running():
+		trunk_tween.kill()
+	trunk_tween = create_tween()
+	trunk_tween.tween_property(trunk_lid, "rotation:x", -1.05, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	trunk_tween.tween_interval(0.75)
+	trunk_tween.tween_property(trunk_lid, "rotation:x", 0.0, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+
+
 func _refresh_trunk() -> void:
 	var signature := ""
 	for loaded_id in GameState.trunk:
@@ -577,6 +597,8 @@ func reset_world() -> void:
 	if is_instance_valid(car_root):
 		car_root.visible = true
 		car_root.position = Vector3(-4.4, 0, 11.3)
+	if is_instance_valid(trunk_lid):
+		trunk_lid.rotation = Vector3.ZERO
 	if is_instance_valid(owner_car_root):
 		owner_car_root.visible = true
 		owner_car_root.position = Vector3(4.4, 0, 11.3)

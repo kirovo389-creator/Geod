@@ -63,6 +63,9 @@ network = (ROOT / "scripts/network/network_manager.gd").read_text(encoding="utf-
 for required in ("ENetMultiplayerPeer", "create_server", "create_client", "server_request_action", "submit_transform", "receive_snapshot", "if last_positions.has(sender)"):
     require(required in network, f"Network feature is missing: {required}")
 
+world = (ROOT / "scripts/world/house_level.gd").read_text(encoding="utf-8")
+require("func animate_trunk" in world and "AnimatedTrunkLid" in world, "Animated trunk lid is missing.")
+
 preset = (ROOT / "export_presets.cfg").read_text(encoding="utf-8")
 require("permissions/internet=true" in preset, "Android export must include Internet permission for LAN UDP.")
 require('AudioManager="*res://scripts/core/audio_manager.gd"' in project, "AudioManager autoload is missing.")
