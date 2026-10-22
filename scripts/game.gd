@@ -54,6 +54,14 @@ func _ready() -> void:
 	sun.shadow_enabled = true
 	add_child(sun)
 	block(self, Vector3(0,-1.2,0), Vector3(30,2,30), Color(0.18,0.45,0.29))
+	var island_body := StaticBody3D.new()
+	island_body.position = Vector3(0,-1.2,0)
+	var island_shape := CollisionShape3D.new()
+	var island_box := BoxShape3D.new()
+	island_box.size = Vector3(30,2,30)
+	island_shape.shape = island_box
+	island_body.add_child(island_shape)
+	add_child(island_body)
 	block(self, Vector3(0,-2.5,0), Vector3(23,1,23), Color(0.29,0.32,0.4))
 	block(self, Vector3(0,-3.3,0), Vector3(15,1,15), Color(0.18,0.21,0.3))
 	for i in range(7):
