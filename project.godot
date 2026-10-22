@@ -1,22 +1,29 @@
 config_version=5
 
 [application]
-config/name="AETHER: Осколки неба"
-run/main_scene="res://main.tscn"
+config/name="How to Suck"
+run/main_scene="res://scenes/main/main.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
+
+[autoload]
+SaveManager="*res://scripts/core/save_manager.gd"
+GameState="*res://scripts/core/game_state.gd"
+NetworkManager="*res://scripts/network/network_manager.gd"
 
 [display]
 window/size/viewport_width=1280
 window/size/viewport_height=720
-window/size/window_width_override=960
-window/size/window_height_override=540
-window/stretch/mode="viewport"
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 window/handheld/orientation=0
+window/energy_saving/keep_screen_on=true
 
 [rendering]
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
-environment/defaults/default_clear_color=Color(0.47, 0.7, 0.91, 1)
+environment/defaults/default_clear_color=Color(0.11, 0.16, 0.22, 1)
 anti_aliasing/quality/msaa_3d=0
 anti_aliasing/quality/screen_space_aa=0

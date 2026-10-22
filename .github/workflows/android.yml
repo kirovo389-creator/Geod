@@ -1,12 +1,14 @@
-name: Build AETHER Android (Godot 4.5.2)
+name: Build How to Suck Android (Godot 4.5.2)
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   GODOT_VERSION: 4.5.2
@@ -14,12 +16,14 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
@@ -45,7 +49,8 @@ jobs:
           test -d "$ANDROID_HOME/ndk/28.1.13356709"
           test -x "$JAVA_HOME/bin/java"
           ls -l "$SDK_TOOLS_ROOT"
-      - name: Install Godot and Android export templates
+
+      - name: Install Godot and matching Android templates
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip wget libfontconfig1
@@ -80,37 +85,73 @@ jobs:
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
 
-      - name: Import project and check scripts
+      - name: Check project structure
+        run: python3 tests/verify_project.py
+
+      - name: Import project and run state tests
         run: |
           set -o pipefail
           godot --headless --editor --path . --import --quit 2>&1 | tee /tmp/godot-import.log
+          godot --headless --path . --quit-after 100 res://tests/game_state_test.tscn 2>&1 | tee /tmp/godot-tests.log
+          grep -q "GAME_STATE_TESTS_PASSED" /tmp/godot-tests.log
+          if grep -Ei 'SCRIPT ERROR:|Parse Error:|SHADER ERROR:|shader compilation failed|error parsing shader|GAME_STATE_TESTS_FAILED' /tmp/godot-import.log /tmp/godot-tests.log; then
+            echo "Godot import or game-state tests failed."
+            exit 1
+          fi
+
+      - name: Load the main scene and smoke-test scripts
+        run: |
+          set -o pipefail
           godot --headless --path . --quit-after 10 --verbose 2>&1 | tee /tmp/godot-smoke.log
-          if grep -Ei 'SCRIPT ERROR:|Parse Error:|SHADER ERROR:|shader compilation failed|error parsing shader' /tmp/godot-import.log /tmp/godot-smoke.log; then
-            echo "Godot script smoke test failed."
+          if grep -Ei 'SCRIPT ERROR:|Parse Error:|SHADER ERROR:|shader compilation failed|error parsing shader' /tmp/godot-smoke.log; then
+            echo "Main scene smoke test failed."
             exit 1
           fi
 
       - name: Export Android APK
         run: |
-          godot --headless --verbose --path . --export-debug "Android" "$PWD/build/Aether.apk"
-          test -s build/Aether.apk
-          unzip -t build/Aether.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs build/Aether.apk
-          ls -lh build/Aether.apk
+          godot --headless --verbose --path . --export-debug "Android" "$PWD/build/HowToSuck.apk"
+          test -s build/HowToSuck.apk
+          unzip -t build/HowToSuck.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs build/HowToSuck.apk
+          ls -lh build/HowToSuck.apk
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: AETHER-Android-APK
-          path: build/Aether.apk
+          name: how-to-suck-android-debug
+          path: build/HowToSuck.apk
           if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload diagnostic logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: how-to-suck-build-logs
+          path: /tmp/godot-*.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+  publish-release:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v7
+        with:
+          name: how-to-suck-android-debug
+          path: build
 
       - name: Publish APK release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="godot-android-${GITHUB_RUN_NUMBER}"
-          gh release create "$TAG" build/Aether.apk \
+          TAG="how-to-suck-android-${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" build/HowToSuck.apk \
             --repo "$GITHUB_REPOSITORY" \
-            --title "AETHER Godot Android ${GITHUB_RUN_NUMBER}" \
-            --notes "Godot ${GODOT_VERSION} Compatibility renderer. Commit ${GITHUB_SHA}."
+            --title "How to Suck Android ${GITHUB_RUN_NUMBER}" \
+            --notes "Godot ${GODOT_VERSION}, Compatibility renderer, debug build. Commit ${GITHUB_SHA}. Not a Play Store release."
