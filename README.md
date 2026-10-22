@@ -1,9 +1,17 @@
-# AETHER: Осколки неба — Unity
+# AETHER: Осколки неба
 
-Android 3D prototype rewritten from Godot to Unity 6 (C#).
+3D-прототип для Android на **libGDX** (Java) — без Unity и без лицензии движка.
 
-## Build locally
-Install Unity 6000.0.40f1 with Android Build Support, Android SDK/NDK and OpenJDK. Open this folder in Unity, then build for Android (Landscape).
+## Возможности
+- Альтернативный остров, руины и деревья в 3D.
+- 8 собираемых кристаллов.
+- Сенсорное управление: левая сторона экрана — движение, правая — обзор, кнопка справа внизу — прыжок.
+- Альбомная ориентация и стартовый экран.
+- Совместимость с Android 6.0+.
 
-## GitHub Actions
-The Android workflow requires the repository Actions secret UNITY_LICENSE. UNITY_EMAIL and UNITY_PASSWORD may also be required by your Unity license. Without a valid license secret, GitHub Actions cannot build an APK.
+## Сборка APK
+GitHub Actions автоматически собирает debug APK на push в `main`. Лицензия Unity и секрет `UNITY_LICENSE` не нужны.
+
+Открой вкладку **Actions**, выбери **Build AETHER Android (libGDX)** и скачай артефакт `AETHER-Android-APK`. Также APK публикуется в Releases, если запуск сборки прошёл успешно.
+
+Текущий порт — начальный процедурный прототип. Сборка и запуск на реальном устройстве должны быть проверены после выполнения CI.
