@@ -12,6 +12,8 @@ def require(condition: bool, message: str) -> None:
 
 project = (ROOT / "project.godot").read_text(encoding="utf-8")
 require('config/name="How to Suck"' in project, "Application name must be How to Suck.")
+require('config/icon="res://assets/ui/app_icon.svg"' in project, "Application icon path is not configured.")
+require((ROOT / "assets/ui/app_icon.svg").is_file(), "Application icon SVG is missing.")
 require('run/main_scene="res://scenes/main/main.tscn"' in project, "Main scene path is incorrect.")
 require("window/handheld/orientation=0" in project, "Mobile orientation must remain landscape (Godot 4.5 enum value 0).")
 require("window/size/viewport_width=1280" in project and "window/size/viewport_height=720" in project, "Base viewport must be 1280x720 landscape.")
