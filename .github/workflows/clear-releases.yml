@@ -1,0 +1,26 @@
+name: Clear GitHub Releases
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/clear-releases.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  delete-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete all releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh api --paginate "repos/$GH_REPO/releases?per_page=100" --jq '.[].id' |
+          while read -r id; do
+            [ -z "$id" ] && continue
+            gh api --method DELETE "repos/$GH_REPO/releases/$id"
+            echo "Deleted release $id"
+          done
