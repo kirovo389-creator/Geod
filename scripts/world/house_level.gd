@@ -15,6 +15,7 @@ var departure_started := false
 var default_target_positions: Dictionary = {}
 var sun_ref: DirectionalLight3D
 var environment_ref: Environment
+var cleaning_tweens: Dictionary = {}
 
 
 func _ready() -> void:
@@ -352,13 +353,22 @@ func _make_target(target_id: String, title: String, action: String, pos: Vector3
 				box.size = size
 				visual.mesh = box
 		var material := _material(color, 0.48, 0.06)
+		if visual_kind == "stain":
+			var dirt_shader := load("res://shaders/dirt_surface.gdshader") as Shader
+			var dirt_material := ShaderMaterial.new()
+			dirt_material.shader = dirt_shader
+			dirt_material.set_shader_parameter("dirt_color", Color(color.r, color.g, color.b, 1.0))
+			dirt_material.set_shader_parameter("clean_progress", 0.0)
+			material = null
+			visual.material_override = dirt_material
 		if visual_kind == "tablet":
 			material.metallic = 0.25
 			material.roughness = 0.26
 		if visual_kind == "tv":
 			material.metallic = 0.22
 			material.roughness = 0.20
-		visual.material_override = material
+		if visual_kind != "stain":
+			visual.material_override = material
 		target.add_child(visual)
 	if visual_kind == "door":
 		target.set_meta("original_position", pos)
@@ -473,10 +483,29 @@ func _refresh_state() -> void:
 		var target: Node3D = targets.get(target_id)
 		if is_instance_valid(target):
 			var completed := bool(chore.get("done", false))
-			target.visible = not completed
 			var collision := target.get_node_or_null("CollisionShape3D") as CollisionShape3D
 			if collision != null:
 				collision.disabled = completed
+			var visual := target.get_node_or_null("Visual") as MeshInstance3D
+			var dirt_material := visual.material_override as ShaderMaterial if is_instance_valid(visual) else null
+			if completed and dirt_material != null:
+				target.visible = true
+				if not cleaning_tweens.has(target_id):
+					var clean_tween := create_tween()
+					cleaning_tweens[target_id] = clean_tween
+					clean_tween.tween_property(dirt_material, "shader_parameter/clean_progress", 1.0, 0.42)
+					clean_tween.tween_callback(_finish_clean_animation.bind(target_id, target))
+			elif completed:
+				target.visible = false
+			else:
+				if cleaning_tweens.has(target_id):
+					var active_tween: Tween = cleaning_tweens[target_id]
+					if active_tween.is_running():
+						active_tween.kill()
+					cleaning_tweens.erase(target_id)
+				if dirt_material != null:
+					dirt_material.set_shader_parameter("clean_progress", 0.0)
+				target.visible = true
 
 	for item_id in GameState.items:
 		var target: Node3D = targets.get(str(item_id))
@@ -510,6 +539,12 @@ func _refresh_state() -> void:
 			avatar.set_carrying(GameState.carried_item_for(int(actor_key)) != "")
 
 	_refresh_trunk()
+
+
+func _finish_clean_animation(target_id: String, target: Node3D) -> void:
+	cleaning_tweens.erase(target_id)
+	if GameState.is_clean_task_done(target_id) and is_instance_valid(target):
+		target.visible = false
 
 
 func _refresh_trunk() -> void:

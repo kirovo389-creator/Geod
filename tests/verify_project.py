@@ -51,6 +51,11 @@ ui = (ROOT / "scripts/ui/game_ui.gd").read_text(encoding="utf-8")
 require("ЭНЕРГИЯ РЫВКА" in ui and "func set_stamina" in ui, "Stamina HUD is not wired.")
 audio = (ROOT / "scripts/core/audio_manager.gd").read_text(encoding="utf-8")
 require("func play_event" in audio and "AudioStreamWAV" in audio, "Generated interaction audio is missing.")
+dirt_shader_path = ROOT / "shaders/dirt_surface.gdshader"
+require(dirt_shader_path.is_file(), "Dirt-cleaning shader is missing.")
+dirt_shader = dirt_shader_path.read_text(encoding="utf-8")
+require("uniform float clean_progress" in dirt_shader and "ALPHA" in dirt_shader, "Dirt shader must support progressive cleaning.")
+require("shader_parameter/clean_progress" in (ROOT / "scripts/world/house_level.gd").read_text(encoding="utf-8"), "Cleaning progress is not animated in the world.")
 require('"footstep"' in audio and '"footstep_heavy"' in audio, "Movement footstep audio events are missing.")
 require("footstep_timer" in player and "AudioManager.play_event" in player, "Footsteps are not connected to player movement.")
 
