@@ -437,14 +437,24 @@ func make_ui() -> void:
 	play.add_theme_color_override("font_color", Color(0.02, 0.08, 0.14))
 	var play_style := StyleBoxFlat.new()
 	play_style.bg_color = Color(0.24, 0.84, 0.98)
+	play_style.border_color = Color(0.71, 0.97, 1.0)
+	play_style.set_border_width_all(1)
 	play_style.set_corner_radius_all(16)
+	play_style.shadow_color = Color(0.0, 0.16, 0.28, 0.55)
+	play_style.shadow_size = 9
+	play_style.shadow_offset = Vector2(0, 4)
 	play_style.content_margin_top = 12
 	play_style.content_margin_bottom = 12
 	play.add_theme_stylebox_override("normal", play_style)
 	var hover_style := play_style.duplicate() as StyleBoxFlat
 	hover_style.bg_color = Color(0.48, 0.91, 1.0)
+	hover_style.shadow_size = 13
 	play.add_theme_stylebox_override("hover", hover_style)
-	play.add_theme_stylebox_override("pressed", hover_style)
+	var pressed_style := play_style.duplicate() as StyleBoxFlat
+	pressed_style.bg_color = Color(0.16, 0.68, 0.84)
+	pressed_style.shadow_size = 2
+	pressed_style.shadow_offset = Vector2(0, 1)
+	play.add_theme_stylebox_override("pressed", pressed_style)
 	play.pressed.connect(func():
 		game_started = true
 		menu.queue_free()
