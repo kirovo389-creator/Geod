@@ -1,11 +1,9 @@
-# AETHER: Осколки неба
+# AETHER: Осколки неба — Unity
 
-Жанр: 3D-приключение, исследование и сбор предметов. Движок: Godot 4.4, GDScript. Платформа: Android.
+Android 3D prototype rewritten from Godot to Unity 6 (C#).
 
-Исследуй парящий остров, руины и собирай восемь светящихся осколков. Стиль — low-poly: небесный градиент, зелёные острова, каменные колонны и бирюзовые кристаллы.
+## Build locally
+Install Unity 6000.0.40f1 with Android Build Support, Android SDK/NDK and OpenJDK. Open this folder in Unity, then build for Android (Landscape).
 
-## Управление
-- Android: джойстик слева, веди пальцем по правой части экрана для обзора, кнопки JUMP и TAKE справа.
-- ПК: WASD/стрелки, Space для прыжка, удерживай левую кнопку мыши и двигай мышь для обзора.
-
-GitHub Actions должен собрать debug APK и опубликовать его в Releases. APK предназначен для тестирования, не для публикации в Google Play.
+## GitHub Actions
+The Android workflow requires the repository Actions secret UNITY_LICENSE. UNITY_EMAIL and UNITY_PASSWORD may also be required by your Unity license. Without a valid license secret, GitHub Actions cannot build an APK.

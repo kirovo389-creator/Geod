@@ -1,88 +1,44 @@
-name: Build Android APK
-
+name: Build AETHER Android (Unity)
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: write
-
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  build-android:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
-
-      - name: Install Android SDK packages
-        run: sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-      - name: Install Godot and export templates
+      - uses: actions/checkout@v4
+      - name: Check Unity license
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         run: |
-          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip -O /tmp/godot.zip
-          unzip -q /tmp/godot.zip -d /tmp/godot
-          sudo mv /tmp/godot/Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
-          sudo chmod +x /usr/local/bin/godot
-          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz -O /tmp/templates.tpz
-          mkdir -p "$HOME/.local/share/godot/export_templates/4.4.1.stable"
-          unzip -q /tmp/templates.tpz -d /tmp/godot-templates
-          cp -a /tmp/godot-templates/templates/. "$HOME/.local/share/godot/export_templates/4.4.1.stable/"
-          mkdir -p "$HOME/.config/godot" "$HOME/.android"
-          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
-          [gd_resource type="EditorSettings" format=3]
-
-          [resource]
-          export/android/android_sdk_path = "$ANDROID_HOME"
-          export/android/java_sdk_path = "$JAVA_HOME"
-          EOF
-          godot --version
-          test -d "$ANDROID_HOME/platforms/android-34"
-          test -d "$ANDROID_HOME/build-tools/34.0.0"
-
-      - name: Import project and export signed APK
-        run: |
-          mkdir -p "$HOME/.android" build
-          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
-            -storepass android -alias androiddebugkey -keypass android \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
-          export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
-          export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
-          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
-          godot --headless --path . --editor --import --quit
-          set -o pipefail
-          godot --headless --path . --quit-after 10 --verbose 2>&1 | tee /tmp/godot-smoke.log
-          if grep -E 'SCRIPT ERROR:|Parse Error:' /tmp/godot-smoke.log; then
-            echo "Main scene smoke test failed."
+          if [ -z "$UNITY_LICENSE" ]; then
+            echo "::error::Add UNITY_LICENSE to repository Actions secrets to build Unity."
             exit 1
           fi
-          godot --headless --verbose --path . --export-debug "Android" "$PWD/build/Aether.apk"
-          test -s build/Aether.apk
-          unzip -t build/Aether.apk
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs build/Aether.apk
-
-      - name: Report APK size
+      - name: Build Android APK
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: .
+          unityVersion: 6000.0.40f1
+          targetPlatform: Android
+          androidAppBundle: false
+      - name: Verify APK and print size
         run: |
-          echo "APK file size:"
-          ls -lh build/Aether.apk
-          stat -c 'APK size: %s bytes' build/Aether.apk
-
-      - name: Publish GitHub Release
+          APK="$(find . -type f -name '*.apk' -print -quit)"
+          test -n "$APK" && test -s "$APK"
+          ls -lh "$APK"
+          stat -c 'APK size: %s bytes' "$APK"
+          echo "APK_PATH=$APK" >> "$GITHUB_ENV"
+      - name: Publish APK
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="android-build-${GITHUB_RUN_NUMBER}"
-          gh release create "$TAG" build/Aether.apk \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "AETHER Android build ${GITHUB_RUN_NUMBER}" \
-            --notes "Подписанный debug APK для тестирования. Коммит ${GITHUB_SHA}."
+          TAG="unity-android-${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" "$APK_PATH" --repo "$GITHUB_REPOSITORY" --title "AETHER Unity Android ${GITHUB_RUN_NUMBER}" --notes "Unity Android APK. Commit ${GITHUB_SHA}."
