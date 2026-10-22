@@ -3,7 +3,13 @@ extends Node3D
 var body_root: Node3D
 var carried_prop: Node3D
 var name_tag: Label3D
+var left_leg: MeshInstance3D
+var right_leg: MeshInstance3D
+var left_sleeve: MeshInstance3D
+var right_sleeve: MeshInstance3D
 var motion_phase := 0.0
+var walk_amount := 0.0
+var last_position := Vector3.ZERO
 
 
 func _ready() -> void:
@@ -16,8 +22,8 @@ func _ready() -> void:
 	_add_box("Boot_Right", Vector3(0.135, 0.13, -0.045), Vector3(0.23, 0.16, 0.34), Color(0.045, 0.055, 0.065), 0.86)
 	_add_box("Boot_Sole_Left", Vector3(-0.135, 0.065, -0.04), Vector3(0.235, 0.035, 0.34), Color(0.015, 0.02, 0.025), 0.98)
 	_add_box("Boot_Sole_Right", Vector3(0.135, 0.065, -0.04), Vector3(0.235, 0.035, 0.34), Color(0.015, 0.02, 0.025), 0.98)
-	_add_capsule("Trouser_Left", Vector3(-0.14, 0.48, 0.025), 0.105, 0.67, Color(0.10, 0.16, 0.21))
-	_add_capsule("Trouser_Right", Vector3(0.14, 0.48, 0.025), 0.105, 0.67, Color(0.10, 0.16, 0.21))
+	left_leg = _add_capsule("Trouser_Left", Vector3(-0.14, 0.48, 0.025), 0.105, 0.67, Color(0.10, 0.16, 0.21))
+	right_leg = _add_capsule("Trouser_Right", Vector3(0.14, 0.48, 0.025), 0.105, 0.67, Color(0.10, 0.16, 0.21))
 	_add_box("Utility_Belt", Vector3(0, 0.86, 0.0), Vector3(0.44, 0.095, 0.32), Color(0.16, 0.12, 0.085), 0.96)
 	_add_box("Belt_Buckle", Vector3(0, 0.86, -0.168), Vector3(0.075, 0.045, 0.018), Color(0.68, 0.52, 0.22), 0.35, 0.6)
 
@@ -39,8 +45,8 @@ func _ready() -> void:
 	_add_capsule("Nose", Vector3(0, 1.79, -0.164), 0.024, 0.065, Color(0.62, 0.43, 0.31))
 
 	# Arms hang below the shoulder line; gloves and cuffs are distinct pieces.
-	_add_capsule("Sleeve_Left", Vector3(-0.365, 1.22, 0.005), 0.09, 0.62, Color(0.10, 0.23, 0.28), Vector3(0, 0, -0.12))
-	_add_capsule("Sleeve_Right", Vector3(0.365, 1.22, 0.005), 0.09, 0.62, Color(0.10, 0.23, 0.28), Vector3(0, 0, 0.12))
+	left_sleeve = _add_capsule("Sleeve_Left", Vector3(-0.365, 1.22, 0.005), 0.09, 0.62, Color(0.10, 0.23, 0.28), Vector3(0, 0, -0.12))
+	right_sleeve = _add_capsule("Sleeve_Right", Vector3(0.365, 1.22, 0.005), 0.09, 0.62, Color(0.10, 0.23, 0.28), Vector3(0, 0, 0.12))
 	_add_box("Cuff_Left", Vector3(-0.39, 0.94, -0.01), Vector3(0.16, 0.075, 0.16), Color(0.78, 0.61, 0.22), 0.75)
 	_add_box("Cuff_Right", Vector3(0.39, 0.94, -0.01), Vector3(0.16, 0.075, 0.16), Color(0.78, 0.61, 0.22), 0.75)
 	_add_sphere("Glove_Left", Vector3(-0.40, 0.85, -0.03), 0.095, 0.14, Color(0.07, 0.11, 0.13))
@@ -62,6 +68,7 @@ func _ready() -> void:
 	name_tag.modulate = Color(0.75, 0.94, 0.96)
 	name_tag.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	add_child(name_tag)
+	last_position = global_position
 
 
 func _add_box(part_name: String, pos: Vector3, dimensions: Vector3, tint: Color, roughness := 0.84, metallic := 0.0) -> MeshInstance3D:
@@ -115,6 +122,25 @@ func _add_sphere(part_name: String, pos: Vector3, radius: float, height: float, 
 	mesh_node.material_override = material
 	body_root.add_child(mesh_node)
 	return mesh_node
+
+
+func _process(delta: float) -> void:
+	var moved_distance := global_position.distance_to(last_position)
+	last_position = global_position
+	var target_walk := clampf(moved_distance / maxf(delta, 0.001) / 2.4, 0.0, 1.0)
+	walk_amount = move_toward(walk_amount, target_walk, delta * 7.0)
+	motion_phase += delta * (8.5 if walk_amount > 0.08 else 2.0)
+	var swing := sin(motion_phase) * 0.42 * walk_amount
+	if is_instance_valid(left_leg):
+		left_leg.rotation.z = swing
+	if is_instance_valid(right_leg):
+		right_leg.rotation.z = -swing
+	if is_instance_valid(left_sleeve):
+		left_sleeve.rotation.z = -0.12 - swing * 0.55
+	if is_instance_valid(right_sleeve):
+		right_sleeve.rotation.z = 0.12 + swing * 0.55
+	if is_instance_valid(body_root):
+		body_root.position.y = absf(sin(motion_phase * 2.0)) * 0.018 * walk_amount
 
 
 func apply_transform(world_position: Vector3, world_yaw: float) -> void:
