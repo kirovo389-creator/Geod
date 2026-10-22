@@ -182,7 +182,7 @@ func _input(e: InputEvent) -> void:
 		if e.index == joy_id:
 			joy = ((e.position-joy_start)/65.0).limit_length(1.0)
 		elif e.index == look_id:
-			var d := e.position-look_last
+			var d: Vector2 = e.position-look_last
 			yaw -= d.x*0.006
 			pitch = clampf(pitch-d.y*0.004,-1.0,0.7)
 			look_last = e.position
