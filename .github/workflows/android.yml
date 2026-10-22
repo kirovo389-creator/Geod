@@ -46,16 +46,24 @@ jobs:
           export/android/java_sdk_path = "$JAVA_HOME"
           EOF
           godot --version
-          cat "$HOME/.config/godot/editor_settings-4.tres"
           test -d "$ANDROID_HOME/platforms/android-34"
           test -d "$ANDROID_HOME/build-tools/34.0.0"
 
-      - name: Import project and export APK
+      - name: Import project and export signed APK
         run: |
+          mkdir -p "$HOME/.android" build
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$HOME/.android/debug.keystore"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_USER="androiddebugkey"
+          export GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD="android"
           godot --headless --path . --editor --import --quit
-          mkdir -p build
           godot --headless --verbose --path . --export-debug "Android" "$PWD/build/Aether.apk"
           test -s build/Aether.apk
+          unzip -t build/Aether.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs build/Aether.apk
 
       - name: Publish GitHub Release
         env:
@@ -65,4 +73,4 @@ jobs:
           gh release create "$TAG" build/Aether.apk \
             --repo "$GITHUB_REPOSITORY" \
             --title "AETHER Android build ${GITHUB_RUN_NUMBER}" \
-            --notes "Автоматическая Android-сборка из коммита ${GITHUB_SHA}. Debug APK для тестирования."
+            --notes "Подписанный debug APK для тестирования. Коммит ${GITHUB_SHA}."
