@@ -21,6 +21,7 @@ import java.util.List;
 public class AetherGame extends ApplicationAdapter {
     private PerspectiveCamera camera;
     private ModelBatch modelBatch;
+    private Environment environment;
     private SpriteBatch uiBatch;
     private BitmapFont font;
     private final List<ModelInstance> world = new ArrayList<>();
@@ -39,6 +40,9 @@ public class AetherGame extends ApplicationAdapter {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = 0.1f; camera.far = 180f;
         modelBatch = new ModelBatch();
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, .8f, .8f, .8f, 1f));
+        environment.add(new DirectionalLight().set(.75f, .75f, .75f, -1f, -.8f, -.3f));
         uiBatch = new SpriteBatch();
         font = new BitmapFont();
         font.getData().setScale(1.35f);
@@ -153,7 +157,7 @@ public class AetherGame extends ApplicationAdapter {
             MathUtils.sin(pitch*MathUtils.degreesToRadians),MathUtils.cos(r)*MathUtils.cos(pitch*MathUtils.degreesToRadians)).nor();
         camera.up.set(Vector3.Y); camera.update();
         modelBatch.begin(camera);
-        for(ModelInstance instance:world) modelBatch.render(instance);
+        for(ModelInstance instance:world) modelBatch.render(instance, environment);
         modelBatch.end();
         uiBatch.begin();
         font.setColor(Color.WHITE);
