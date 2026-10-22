@@ -12,5 +12,5 @@ android {
 }
 dependencies {
     implementation project(':core')
-    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-android:${rootProject.ext.gdxVersion}"
 }
